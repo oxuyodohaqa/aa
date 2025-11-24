@@ -30,6 +30,8 @@ const CONFIG = {
     retryAllFilesOnFailure: true
 };
 
+const FINAL_LINK_TEMPLATE = 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}&utm_source=gemini&utm_medium=web&utm_campaign=advmktgsite';
+
 // COUNTRY CONFIGURATIONS - ALL 24 COUNTRIES WITH SAME PROGRAM ID
 const COUNTRIES = {
     'US': {
@@ -45,7 +47,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_us.json'
     },
     'CA': {
@@ -61,7 +63,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_ca.json'
     },
     'GB': {
@@ -77,7 +79,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_gb.json'
     },
     'IN': {
@@ -93,7 +95,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_in.json'
     },
     'ID': {
@@ -109,7 +111,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_id.json'
     },
     'AU': {
@@ -125,7 +127,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_au.json'
     },
     'DE': {
@@ -141,7 +143,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_de.json'
     },
     'FR': {
@@ -157,7 +159,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_fr.json'
     },
     'ES': {
@@ -173,7 +175,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_es.json'
     },
     'IT': {
@@ -189,7 +191,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_it.json'
     },
     'BR': {
@@ -205,7 +207,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_br.json'
     },
     'MX': {
@@ -221,7 +223,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_mx.json'
     },
     'NL': {
@@ -237,7 +239,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_nl.json'
     },
     'SE': {
@@ -253,7 +255,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_se.json'
     },
     'NO': {
@@ -269,7 +271,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_no.json'
     },
     'DK': {
@@ -285,7 +287,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_dk.json'
     },
     'JP': {
@@ -301,7 +303,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_jp.json'
     },
     'KR': {
@@ -317,7 +319,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_kr.json'
     },
     'SG': {
@@ -333,7 +335,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_sg.json'
     },
     'NZ': {
@@ -349,7 +351,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_nz.json'
     },
     'ZA': {
@@ -365,7 +367,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_za.json'
     },
     'CN': {
@@ -381,7 +383,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_cn.json'
     },
     'AE': {
@@ -397,7 +399,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_ae.json'
     },
     'PH': {
@@ -413,7 +415,7 @@ const COUNTRIES = {
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_ph.json'
     }
 };
