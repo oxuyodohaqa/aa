@@ -1161,6 +1161,7 @@ class VerificationSession {
         const finalLinkDomains = this.countryConfig.finalLinkDomains || [
             'google.com',
             'one.google.com',
+            'accounts.google.com',
             'services.sheerid.com'
         ];
         const endpoints = [
@@ -1172,27 +1173,39 @@ class VerificationSession {
             return finalLinkDomains.some(domain => url?.includes(domain));
         };
 
+        const extractUrlFromContent = (content) => {
+            if (typeof content !== 'string') return null;
+            const urlRegex = /https?:\/\/[^"'<>\s]+/g;
+            const matches = content.match(urlRegex) || [];
+            return matches.find(url => urlMatchesTargetDomain(url)) || null;
+        };
+
+        const captureUrl = (response) => {
+            if (!response) return null;
+
+            const headerUrl = response.headers?.location || response.data?.redirectUrl;
+            if (urlMatchesTargetDomain(headerUrl)) return headerUrl;
+
+            const requestUrl = response.request?.res?.responseUrl || response.request?._redirectable?._currentUrl;
+            if (urlMatchesTargetDomain(requestUrl)) return requestUrl;
+
+            return extractUrlFromContent(response.data);
+        };
+
         for (const endpoint of endpoints) {
             try {
-                const response = await this.client.get(endpoint, { maxRedirects: 0 });
-                let url = response.headers.location || response.data?.redirectUrl;
+                // Try without following redirects so we can read Location headers
+                const headResponse = await this.client.get(endpoint, { maxRedirects: 0, validateStatus: () => true });
+                const headUrl = captureUrl(headResponse);
+                if (headUrl) return headUrl;
 
-                if (urlMatchesTargetDomain(url)) {
-                    if (!url.includes('verificationId=')) {
-                        const separator = url.includes('?') ? '&' : '?';
-                        url = `${url}${separator}verificationId=${this.verificationId}`;
-                    }
-                    return url;
-                }
+                // Follow redirects to capture the final landing page URL or any embedded offer link
+                const followResponse = await this.client.get(endpoint, { maxRedirects: 5, validateStatus: () => true });
+                const followUrl = captureUrl(followResponse);
+                if (followUrl) return followUrl;
             } catch (error) {
-                if (urlMatchesTargetDomain(error.response?.headers?.location)) {
-                    let url = error.response.headers.location;
-                    if (!url.includes('verificationId=')) {
-                        const separator = url.includes('?') ? '&' : '?';
-                        url = `${url}${separator}verificationId=${this.verificationId}`;
-                    }
-                    return url;
-                }
+                const errorUrl = captureUrl(error.response);
+                if (errorUrl) return errorUrl;
                 continue;
             }
         }
@@ -1339,7 +1352,7 @@ function saveVerificationUrl(student, url, verificationId, countryConfig, upload
 async function processStudent(student, sessionId, collegeMatcher, deleteManager, countryConfig, statsTracker) {
     const session = new VerificationSession(sessionId, countryConfig);
     let college = null;
-    
+
     try {
         console.log(`[${sessionId}] 🎯 [${countryConfig.flag}] Processing ${student.firstName} ${student.lastName} (${student.studentId})`);
         
@@ -1376,7 +1389,7 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         // STEP 3: Submit personal info with exact college match
         const dob = generateDOB();
         const step = await session.submitPersonalInfo(student, dob, college);
-        
+
         // ✅ MODIFIED: Don't return early on instant success - continue to force upload
         let ssoInstantSuccess = false;
         if (step === 'success') {
@@ -1438,11 +1451,6 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         const files = findStudentFiles(student.studentId);
         if (files.length === 0) {
             console.log(`[${sessionId}] ⚠️ [${countryConfig.flag}] No files found for ${ssoInstantSuccess || ssoAlreadySuccess ? 'forced ' : ''}upload`);
-
-            // ✅ Force policy: even with SSO success we require an upload
-            if (ssoInstantSuccess || ssoAlreadySuccess) {
-                console.log(`[${sessionId}] ❌ [${countryConfig.flag}] SSO success without files cannot be accepted — force upload required`);
-            }
 
             deleteManager.markStudentFailed(student.studentId);
             collegeMatcher.addFailure();
@@ -1514,11 +1522,13 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         
         // STEP 7: All uploads exhausted
         console.log(`[${sessionId}] ❌ [${countryConfig.flag}] All ${files.length} file(s) exhausted - NO LEGITIMATE VERIFICATION`);
+
         deleteManager.markStudentRejected(student.studentId);
         collegeMatcher.addFailure();
         statsTracker.recordCollegeAttempt(college.id, college.name, false);
+
         return null;
-        
+
     } catch (error) {
         console.log(`[${sessionId}] ❌ [${countryConfig.flag}] Process error: ${error.message}`);
         deleteManager.markStudentFailed(student.studentId);
