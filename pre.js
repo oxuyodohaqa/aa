@@ -1158,18 +1158,26 @@ class VerificationSession {
     async getVerificationUrl() {
         if (!this.verificationId) return null;
 
-        const finalLinkDomain = this.countryConfig.finalLinkDomain || 'services.sheerid.com';
+        const finalLinkDomains = this.countryConfig.finalLinkDomains || [
+            'google.com',
+            'one.google.com',
+            'services.sheerid.com'
+        ];
         const endpoints = [
             this.countryConfig.redirectEndpoint.replace('{verificationId}', this.verificationId),
             `https://services.sheerid.com/redirect/${this.verificationId}`
         ];
+
+        const urlMatchesTargetDomain = (url) => {
+            return finalLinkDomains.some(domain => url?.includes(domain));
+        };
 
         for (const endpoint of endpoints) {
             try {
                 const response = await this.client.get(endpoint, { maxRedirects: 0 });
                 let url = response.headers.location || response.data?.redirectUrl;
 
-                if (url && url.includes(finalLinkDomain)) {
+                if (urlMatchesTargetDomain(url)) {
                     if (!url.includes('verificationId=')) {
                         const separator = url.includes('?') ? '&' : '?';
                         url = `${url}${separator}verificationId=${this.verificationId}`;
@@ -1177,7 +1185,7 @@ class VerificationSession {
                     return url;
                 }
             } catch (error) {
-                if (error.response?.headers?.location?.includes(finalLinkDomain)) {
+                if (urlMatchesTargetDomain(error.response?.headers?.location)) {
                     let url = error.response.headers.location;
                     if (!url.includes('verificationId=')) {
                         const separator = url.includes('?') ? '&' : '?';
