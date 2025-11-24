@@ -12,74 +12,31 @@ const CONFIG = {
     studentsFile: 'students.txt',
     receiptsDir: 'receipts',
     outputFile: 'sukses.txt',
-    maxConcurrent: 100,
-    batchSize: 100,
-    timeout: 300000,
+    maxConcurrent: 400,
+    batchSize: 800,
+    timeout: 30000,
     uploadTimeout: 30000,
     maxRetries: 0,
-    retryDelay: 3000,
+    retryDelay: 1000,
     batchDelay: 1000,
-    verificationTimeout: 10,
+    verificationTimeout: 20, // 20 seconds timeout after upload
     
     selectedCountry: null,
     countryConfig: null,
-    targetLinks: 0,
+    targetLinks: 0, // Will be set by user
     targetReached: false,
     
+    useExactMatchOnly: true,
+    handleSsoColleges: true,
+    skipSsoColleges: false,
     autoDeleteProcessed: true,
-    retryAllFilesOnFailure: true
+    noFallbackCollege: true,
+    retryAllFilesOnFailure: true,
+    smartWorkMode: true // NEW: Smart work with targets
 };
 
-// COUNTRY CONFIGURATIONS - ALL 24 COUNTRIES WITH SAME PROGRAM ID
+// COUNTRY CONFIGURATIONS
 const COUNTRIES = {
-    'US': {
-        name: 'United States',
-        code: 'us',
-        locale: 'en-us',
-        currency: 'USD',
-        flag: '🇺🇸',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=us&locale=en-us',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_us.json'
-    },
-    'CA': {
-        name: 'Canada',
-        code: 'ca',
-        locale: 'en-ca',
-        currency: 'CAD',
-        flag: '🇨🇦',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=ca&locale=en-ca',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_ca.json'
-    },
-    'GB': {
-        name: 'United Kingdom',
-        code: 'gb',
-        locale: 'en-gb',
-        currency: 'GBP',
-        flag: '🇬🇧',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=gb&locale=en-gb',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_gb.json'
-    },
     'IN': {
         name: 'India',
         code: 'in',
@@ -87,334 +44,30 @@ const COUNTRIES = {
         currency: 'INR',
         flag: '🇮🇳',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=in&locale=en-in',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
+        programId: '63fd266996552d469aea40e1',
+        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=in&locale=en-in',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
+        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
         collegesFile: 'sheerid_in.json'
     },
-    'ID': {
-        name: 'Indonesia',
-        code: 'id',
-        locale: 'id-id',
-        currency: 'IDR',
-        flag: '🇮🇩',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=id&locale=id-id',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
+    'US': {
+        name: 'United States',
+        code: 'us',
+        locale: 'en-us',
+        currency: 'USD',
+        flag: '🇺🇸',
+        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'edu'],
+        programId: '63fd266996552d469aea40e2',
+        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e2/?country=us&locale=en-us',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e2/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_id.json'
-    },
-    'AU': {
-        name: 'Australia',
-        code: 'au',
-        locale: 'en-au',
-        currency: 'AUD',
-        flag: '🇦🇺',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=au&locale=en-au',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_au.json'
-    },
-    'DE': {
-        name: 'Germany',
-        code: 'de',
-        locale: 'de-de',
-        currency: 'EUR',
-        flag: '🇩🇪',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=de&locale=de-de',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_de.json'
-    },
-    'FR': {
-        name: 'France',
-        code: 'fr',
-        locale: 'fr-fr',
-        currency: 'EUR',
-        flag: '🇫🇷',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=fr&locale=fr-fr',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_fr.json'
-    },
-    'ES': {
-        name: 'Spain',
-        code: 'es',
-        locale: 'es-es',
-        currency: 'EUR',
-        flag: '🇪🇸',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=es&locale=es-es',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_es.json'
-    },
-    'IT': {
-        name: 'Italy',
-        code: 'it',
-        locale: 'it-it',
-        currency: 'EUR',
-        flag: '🇮🇹',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=it&locale=it-it',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_it.json'
-    },
-    'BR': {
-        name: 'Brazil',
-        code: 'br',
-        locale: 'pt-br',
-        currency: 'BRL',
-        flag: '🇧🇷',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=br&locale=pt-br',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_br.json'
-    },
-    'MX': {
-        name: 'Mexico',
-        code: 'mx',
-        locale: 'es-mx',
-        currency: 'MXN',
-        flag: '🇲🇽',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=mx&locale=es-mx',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_mx.json'
-    },
-    'NL': {
-        name: 'Netherlands',
-        code: 'nl',
-        locale: 'nl-nl',
-        currency: 'EUR',
-        flag: '🇳🇱',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=nl&locale=nl-nl',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_nl.json'
-    },
-    'SE': {
-        name: 'Sweden',
-        code: 'se',
-        locale: 'sv-se',
-        currency: 'SEK',
-        flag: '🇸🇪',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=se&locale=sv-se',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_se.json'
-    },
-    'NO': {
-        name: 'Norway',
-        code: 'no',
-        locale: 'no-no',
-        currency: 'NOK',
-        flag: '🇳🇴',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=no&locale=no-no',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_no.json'
-    },
-    'DK': {
-        name: 'Denmark',
-        code: 'dk',
-        locale: 'da-dk',
-        currency: 'DKK',
-        flag: '🇩🇰',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=dk&locale=da-dk',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_dk.json'
-    },
-    'JP': {
-        name: 'Japan',
-        code: 'jp',
-        locale: 'ja-jp',
-        currency: 'JPY',
-        flag: '🇯🇵',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=jp&locale=ja-jp',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_jp.json'
-    },
-    'KR': {
-        name: 'South Korea',
-        code: 'kr',
-        locale: 'ko-kr',
-        currency: 'KRW',
-        flag: '🇰🇷',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=kr&locale=ko-kr',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_kr.json'
-    },
-    'SG': {
-        name: 'Singapore',
-        code: 'sg',
-        locale: 'en-sg',
-        currency: 'SGD',
-        flag: '🇸🇬',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=sg&locale=en-sg',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_sg.json'
-    },
-    'NZ': {
-        name: 'New Zealand',
-        code: 'nz',
-        locale: 'en-nz',
-        currency: 'NZD',
-        flag: '🇳🇿',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=nz&locale=en-nz',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_nz.json'
-    },
-    'ZA': {
-        name: 'South Africa',
-        code: 'za',
-        locale: 'en-za',
-        currency: 'ZAR',
-        flag: '🇿🇦',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=za&locale=en-za',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_za.json'
-    },
-    'CN': {
-        name: 'China',
-        code: 'cn',
-        locale: 'zh-cn',
-        currency: 'CNY',
-        flag: '🇨🇳',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=cn&locale=zh-cn',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_cn.json'
-    },
-    'AE': {
-        name: 'United Arab Emirates',
-        code: 'ae',
-        locale: 'en-ae',
-        currency: 'AED',
-        flag: '🇦🇪',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=ae&locale=en-ae',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_ae.json'
-    },
-    'PH': {
-        name: 'Philippines',
-        code: 'ph',
-        locale: 'en-ph',
-        currency: 'PHP',
-        flag: '🇵🇭',
-        domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '67c8c14f5f17a83b745e3f82',
-        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=ph&locale=en-ph',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
-        uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
-        statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
-        redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}',
-        collegesFile: 'sheerid_ph.json'
+        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        collegesFile: 'sheerid_us.json'
     }
 };
 
@@ -441,34 +94,17 @@ function askQuestion(query) {
 
 // COUNTRY SELECTOR
 async function selectCountry() {
-    console.log(chalk.cyan('\n🌍 SELECT COUNTRY FOR GOOGLE VERIFICATION:'));
-    console.log(chalk.yellow('1 . United States        (US) | 2 . Canada               (CA)'));
-    console.log(chalk.yellow('3 . United Kingdom       (GB) | 4 . India                (IN)'));
-    console.log(chalk.yellow('5 . Indonesia            (ID) | 6 . Australia            (AU)'));
-    console.log(chalk.yellow('7 . Germany              (DE) | 8 . France               (FR)'));
-    console.log(chalk.yellow('9 . Spain                (ES) | 10. Italy                (IT)'));
-    console.log(chalk.yellow('11. Brazil               (BR) | 12. Mexico               (MX)'));
-    console.log(chalk.yellow('13. Netherlands          (NL) | 14. Sweden               (SE)'));
-    console.log(chalk.yellow('15. Norway               (NO) | 16. Denmark              (DK)'));
-    console.log(chalk.yellow('17. Japan                (JP) | 18. South Korea          (KR)'));
-    console.log(chalk.yellow('19. Singapore            (SG) | 20. New Zealand          (NZ)'));
-    console.log(chalk.yellow('21. South Africa         (ZA) | 22. China                (CN)'));
-    console.log(chalk.yellow('23. UAE                  (AE) | 24. Philippines          (PH)'));
+    console.log(chalk.cyan('\n🌍 SELECT COUNTRY FOR SPOTIFY VERIFICATION:'));
+    console.log(chalk.yellow('1. 🇮🇳 India (IN)'));
+    console.log(chalk.yellow('2. 🇺🇸 United States (US)'));
     
-    const answer = await askQuestion(chalk.blue('\nEnter your choice (1-24 or country code): '));
-    const choice = answer.trim().toUpperCase();
+    const answer = await askQuestion(chalk.blue('\nEnter your choice (1 or 2): '));
+    const choice = answer.trim();
     
-    const countryMap = {
-        '1': 'US', '2': 'CA', '3': 'GB', '4': 'IN', '5': 'ID', '6': 'AU',
-        '7': 'DE', '8': 'FR', '9': 'ES', '10': 'IT', '11': 'BR', '12': 'MX',
-        '13': 'NL', '14': 'SE', '15': 'NO', '16': 'DK', '17': 'JP', '18': 'KR',
-        '19': 'SG', '20': 'NZ', '21': 'ZA', '22': 'CN', '23': 'AE', '24': 'PH'
-    };
-    
-    const selectedCode = countryMap[choice] || choice;
-    
-    if (COUNTRIES[selectedCode]) {
-        return selectedCode;
+    if (choice === '1' || choice.toLowerCase() === 'in' || choice.toLowerCase() === 'india') {
+        return 'IN';
+    } else if (choice === '2' || choice.toLowerCase() === 'us' || choice.toLowerCase() === 'usa') {
+        return 'US';
     } else {
         console.log(chalk.red('❌ Invalid choice. Defaulting to India (IN)'));
         return 'IN';
@@ -512,10 +148,12 @@ class StatisticsTracker {
             instant_exact: 0,
             already_success_exact: 0,
             upload_exact: 0,
-            sso_force_upload: 0
+            upload_sso: 0,
+            sso_no_upload: 0,
+            sso_failed_uploads: 0
         };
         
-        this.collegeStats = new Map();
+        this.collegeStats = new Map(); // collegeId -> {success, failed, name}
         this.fileStats = {
             totalFiles: 0,
             successfulFiles: 0,
@@ -620,19 +258,21 @@ class StatisticsTracker {
     }
 }
 
-// EXACT JSON COLLEGE MATCHER
+// EXACT JSON COLLEGE MATCHER - NO FALLBACKS
 class ExactJsonCollegeMatcher {
     constructor(countryConfig) {
         this.countryConfig = countryConfig;
         this.studentCollegeMap = new Map();
         this.collegesMap = new Map();
         this.invalidCollegeIds = new Set();
+        this.ssoCollegeIds = new Set();
         this.workingCollegeIds = new Set();
         this.receiptPattern = /^(\d+)_(\d+)\.(png|jpg|jpeg|pdf|webp)$/i;
         this.successCount = 0;
         this.failedCount = 0;
         this.exactMatchCount = 0;
         this.noMatchCount = 0;
+        this.ssoCount = 0;
         this.uploadRetryCount = 0;
     }
     
@@ -682,6 +322,8 @@ class ExactJsonCollegeMatcher {
             });
             
             console.log(chalk.green(`📚 Loaded ${colleges.length} colleges from ${collegesFile} ${this.countryConfig.flag}`));
+            console.log(chalk.yellow(`🔐 SSO HANDLING ENABLED - Universities requiring SSO will attempt uploads`));
+            console.log(chalk.red(`⛔ NO FALLBACK MODE - Only exact JSON matches will be processed`));
             
             console.log(chalk.cyan(`📋 Sample colleges from ${collegesFile}:`));
             colleges.slice(0, 5).forEach(college => {
@@ -712,7 +354,13 @@ class ExactJsonCollegeMatcher {
         
         if (this.collegesMap.has(receiptCollegeId)) {
             const college = this.collegesMap.get(receiptCollegeId);
-            console.log(chalk.green(`✅ EXACT MATCH: Student ${studentId} → College ID ${receiptCollegeId} → ${college.name.substring(0, 50)}...`));
+            
+            if (this.ssoCollegeIds.has(receiptCollegeId)) {
+                console.log(chalk.blue(`🔐 SSO COLLEGE: Student ${studentId} → College ID ${receiptCollegeId} → ${college.name.substring(0, 50)}... (SSO)`));
+            } else {
+                console.log(chalk.green(`✅ EXACT MATCH: Student ${studentId} → College ID ${receiptCollegeId} → ${college.name.substring(0, 50)}...`));
+            }
+            
             this.exactMatchCount++;
             return college;
         }
@@ -727,9 +375,21 @@ class ExactJsonCollegeMatcher {
         console.log(chalk.green(`✅ CONFIRMED WORKING: College ID ${collegeId}`));
     }
     
+    markCollegeAsSso(collegeId) {
+        this.ssoCollegeIds.add(collegeId);
+        this.ssoCount++;
+        console.log(chalk.blue(`🔐 SSO COLLEGE: College ID ${collegeId} requires SSO authentication`));
+    }
+    
     markCollegeAsInvalid(collegeId) {
-        this.invalidCollegeIds.add(collegeId);
-        console.log(chalk.red(`❌ MARKED INVALID: College ID ${collegeId}`));
+        if (!this.ssoCollegeIds.has(collegeId)) {
+            this.invalidCollegeIds.add(collegeId);
+            console.log(chalk.red(`❌ MARKED INVALID: College ID ${collegeId}`));
+        }
+    }
+    
+    isCollegeSso(collegeId) {
+        return this.ssoCollegeIds.has(collegeId);
     }
     
     hasReceiptForStudent(studentId) {
@@ -769,6 +429,7 @@ class ExactJsonCollegeMatcher {
             noMatches: this.noMatchCount,
             exactMatchRate: exactMatchRate,
             invalidColleges: this.invalidCollegeIds.size,
+            ssoColleges: this.ssoCollegeIds.size,
             workingColleges: this.workingCollegeIds.size,
             totalColleges: this.collegesMap.size,
             studentsWithReceipts: this.studentCollegeMap.size,
@@ -845,10 +506,14 @@ class ImmediateDeleteManager {
     markStudentNoMatch(studentId) {
         this.deleteStudentImmediately(studentId, 'NO_EXACT_MATCH');
     }
+    
+    markStudentSso(studentId) {
+        this.deleteStudentImmediately(studentId, 'SSO_HANDLED');
+    }
 }
 
-// VERIFICATION SESSION - LEGIT ONLY
-class VerificationSession {
+// VERIFICATION SESSION WITH ENHANCED UPLOAD RETRY AND SSO HANDLING
+class FixedVerificationSession {
     constructor(id, countryConfig) {
         this.id = id;
         this.countryConfig = countryConfig;
@@ -1006,6 +671,14 @@ class VerificationSession {
                     return 'docUpload';
                 }
                 
+                if (this.currentStep === 'sso') {
+                    console.log(`[${this.id}] 🔐 [${this.countryConfig.flag}] SSO STEP detected - Will attempt upload anyway`);
+                    if (collegeMatcher && this.submittedCollegeId) {
+                        collegeMatcher.markCollegeAsSso(this.submittedCollegeId);
+                    }
+                    return 'sso';
+                }
+                
                 if (this.currentStep === 'error' || (data.errorIds && data.errorIds.length > 0)) {
                     console.log(`[${this.id}] ❌ [${this.countryConfig.flag}] Verification error: ${JSON.stringify(data.errorIds || [])}`);
                     if (collegeMatcher && this.submittedCollegeId) {
@@ -1029,6 +702,14 @@ class VerificationSession {
         }
         
         console.log(`[${this.id}] ⏰ [${this.countryConfig.flag}] TIMEOUT reached - Final step: ${this.currentStep}`);
+        
+        if (this.currentStep === 'sso') {
+            console.log(`[${this.id}] 🔐 [${this.countryConfig.flag}] TIMEOUT but SSO detected - Will attempt upload`);
+            if (collegeMatcher && this.submittedCollegeId) {
+                collegeMatcher.markCollegeAsSso(this.submittedCollegeId);
+            }
+            return 'sso';
+        }
         
         if (collegeMatcher && this.submittedCollegeId) {
             collegeMatcher.markCollegeAsInvalid(this.submittedCollegeId);
@@ -1140,6 +821,11 @@ class VerificationSession {
                     return { status: 'SUCCESS', data, waitTime: i+1 };
                 }
                 
+                if (data.currentStep === 'sso') {
+                    console.log(`[${this.id}] 🔐 [${this.countryConfig.flag}] SSO verification detected after ${i+1} seconds`);
+                    return { status: 'SSO', data, waitTime: i+1 };
+                }
+                
                 if (data.rejectionReasons?.length > 0) {
                     console.log(`[${this.id}] ❌ [${this.countryConfig.flag}] Verification REJECTED after ${i+1} seconds`);
                     return { status: 'REJECTED', data, waitTime: i+1 };
@@ -1155,61 +841,39 @@ class VerificationSession {
         return { status: 'TIMEOUT', waitTime: maxWaitTime };
     }
     
-    async getVerificationUrl() {
+    async getSpotifyUrl() {
         if (!this.verificationId) return null;
-
-        const finalLinkDomains = this.countryConfig.finalLinkDomains || [
-            'google.com',
-            'one.google.com',
-            'accounts.google.com',
-            'services.sheerid.com'
-        ];
+        
         const endpoints = [
             this.countryConfig.redirectEndpoint.replace('{verificationId}', this.verificationId),
             `https://services.sheerid.com/redirect/${this.verificationId}`
         ];
-
-        const urlMatchesTargetDomain = (url) => {
-            return finalLinkDomains.some(domain => url?.includes(domain));
-        };
-
-        const extractUrlFromContent = (content) => {
-            if (typeof content !== 'string') return null;
-            const urlRegex = /https?:\/\/[^"'<>\s]+/g;
-            const matches = content.match(urlRegex) || [];
-            return matches.find(url => urlMatchesTargetDomain(url)) || null;
-        };
-
-        const captureUrl = (response) => {
-            if (!response) return null;
-
-            const headerUrl = response.headers?.location || response.data?.redirectUrl;
-            if (urlMatchesTargetDomain(headerUrl)) return headerUrl;
-
-            const requestUrl = response.request?.res?.responseUrl || response.request?._redirectable?._currentUrl;
-            if (urlMatchesTargetDomain(requestUrl)) return requestUrl;
-
-            return extractUrlFromContent(response.data);
-        };
-
+        
         for (const endpoint of endpoints) {
             try {
-                // Try without following redirects so we can read Location headers
-                const headResponse = await this.client.get(endpoint, { maxRedirects: 0, validateStatus: () => true });
-                const headUrl = captureUrl(headResponse);
-                if (headUrl) return headUrl;
-
-                // Follow redirects to capture the final landing page URL or any embedded offer link
-                const followResponse = await this.client.get(endpoint, { maxRedirects: 5, validateStatus: () => true });
-                const followUrl = captureUrl(followResponse);
-                if (followUrl) return followUrl;
+                const response = await this.client.get(endpoint, { maxRedirects: 0 });
+                let url = response.headers.location || response.data?.redirectUrl;
+                
+                if (url && url.includes('spotify.com')) {
+                    if (!url.includes('verificationId=')) {
+                        const separator = url.includes('?') ? '&' : '?';
+                        url = `${url}${separator}verificationId=${this.verificationId}`;
+                    }
+                    return url;
+                }
             } catch (error) {
-                const errorUrl = captureUrl(error.response);
-                if (errorUrl) return errorUrl;
+                if (error.response?.headers?.location?.includes('spotify.com')) {
+                    let url = error.response.headers.location;
+                    if (!url.includes('verificationId=')) {
+                        const separator = url.includes('?') ? '&' : '?';
+                        url = `${url}${separator}verificationId=${this.verificationId}`;
+                    }
+                    return url;
+                }
                 continue;
             }
         }
-
+        
         return this.countryConfig.finalLinkFormat.replace('{verificationId}', this.verificationId);
     }
     
@@ -1318,15 +982,14 @@ function findStudentFiles(studentId) {
     return files.sort((a, b) => b.size - a.size);
 }
 
-function saveVerificationUrl(student, url, verificationId, countryConfig, uploadStats = null) {
+function saveSpotifyUrl(student, url, verificationId, countryConfig, uploadStats = null) {
     try {
         fs.appendFileSync(CONFIG.outputFile, url + '\n');
-
+        
         const logEntry = JSON.stringify({
             datetime: new Date().toISOString(),
             country: countryConfig.name,
             countryCode: countryConfig.code,
-            programId: countryConfig.programId,
             student: {
                 firstName: student.firstName,
                 lastName: student.lastName,
@@ -1334,12 +997,12 @@ function saveVerificationUrl(student, url, verificationId, countryConfig, upload
                 email: student.email
             },
             verificationId: verificationId,
-            verificationUrl: url,
+            spotifyUrl: url,
             matchType: 'EXACT_JSON_MATCH',
             uploadStats: uploadStats
         }) + '\n';
-
-        fs.appendFileSync(`verification_${countryConfig.code}_success.txt`, logEntry);
+        
+        fs.appendFileSync(`spotify_${countryConfig.code}_success.txt`, logEntry);
         console.log(chalk.green(`💾 [${countryConfig.flag}] SUCCESS: ${url}`));
         return true;
     } catch (error) {
@@ -1348,26 +1011,25 @@ function saveVerificationUrl(student, url, verificationId, countryConfig, upload
     }
 }
 
-// ✅ MODIFIED MAIN PROCESSOR - FORCE UPLOAD EVEN FOR SSO SUCCESS
+// MAIN PROCESSOR WITH ENHANCED UPLOAD RETRY AND SSO HANDLING + STATISTICS
 async function processStudent(student, sessionId, collegeMatcher, deleteManager, countryConfig, statsTracker) {
-    const session = new VerificationSession(sessionId, countryConfig);
-    let college = null;
-
+    const session = new FixedVerificationSession(sessionId, countryConfig);
+    
     try {
         console.log(`[${sessionId}] 🎯 [${countryConfig.flag}] Processing ${student.firstName} ${student.lastName} (${student.studentId})`);
         
-        // STEP 1: Check for exact match from JSON
+        // STEP 1: Check for exact match from JSON - NO FALLBACK
         if (!collegeMatcher.hasReceiptForStudent(student.studentId)) {
-            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] No receipt file found - SKIPPING`);
+            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] No receipt file found - SKIPPING (NO FALLBACK)`);
             deleteManager.markStudentFailed(student.studentId);
             collegeMatcher.addFailure();
             statsTracker.recordFailureReason('noReceipt');
             return null;
         }
         
-        college = collegeMatcher.getExactCollegeForStudent(student.studentId);
+        const college = collegeMatcher.getExactCollegeForStudent(student.studentId);
         if (!college) {
-            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] NO EXACT MATCH in ${countryConfig.collegesFile} - SKIPPING`);
+            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] NO EXACT MATCH in ${countryConfig.collegesFile} - SKIPPING (NO FALLBACK)`);
             deleteManager.markStudentNoMatch(student.studentId);
             collegeMatcher.addFailure();
             statsTracker.recordFailureReason('noExactMatch');
@@ -1389,13 +1051,20 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         // STEP 3: Submit personal info with exact college match
         const dob = generateDOB();
         const step = await session.submitPersonalInfo(student, dob, college);
-
-        // ✅ MODIFIED: Don't return early on instant success - continue to force upload
-        let ssoInstantSuccess = false;
+        
         if (step === 'success') {
-            console.log(`[${sessionId}] ⚡ [${countryConfig.flag}] SSO Instant success detected - will force upload files`);
-            ssoInstantSuccess = true;
-            // Don't return - continue to upload step
+            console.log(`[${sessionId}] 🎉 [${countryConfig.flag}] Instant success with EXACT match!`);
+            const spotifyUrl = await session.getSpotifyUrl();
+            
+            if (spotifyUrl) {
+                const result = { student, url: spotifyUrl, type: 'instant_exact', college: college.name };
+                saveSpotifyUrl(student, spotifyUrl, session.verificationId, countryConfig, session.getUploadStats());
+                deleteManager.markStudentSuccess(student.studentId);
+                collegeMatcher.addSuccess();
+                statsTracker.recordSuccess(result);
+                statsTracker.recordCollegeAttempt(college.id, college.name, true);
+                return result;
+            }
         }
         
         if (step === 'error') {
@@ -1407,30 +1076,26 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
             return null;
         }
         
-        // STEP 4: Skip SSO wait and proceed directly to upload
-        let stepResult = 'docUpload';
-        let ssoAlreadySuccess = false;
-
-        const preUploadStatus = await session.checkStatus(1);
-        if (preUploadStatus.status === 'SUCCESS') {
-            console.log(`[${sessionId}] ⚡ [${countryConfig.flag}] SSO success detected - forcing upload and waiting for verification`);
-            ssoAlreadySuccess = true;
-        } else if (preUploadStatus.status === 'REJECTED') {
-            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] SSO status shows rejection before upload`);
-            deleteManager.markStudentRejected(student.studentId);
-            collegeMatcher.addFailure();
-            statsTracker.recordCollegeAttempt(college.id, college.name, false);
-            return null;
-        }
-
-        if (ssoInstantSuccess) {
-            console.log(`[${sessionId}] ⏭️ [${countryConfig.flag}] SSO instant success - skipping wait and forcing upload`);
-        } else {
-            console.log(`[${sessionId}] ⏩ [${countryConfig.flag}] Bypassing SSO wait — proceeding directly to upload step`);
+        // STEP 4: Wait for step progression
+        const stepResult = await session.waitForCorrectStep(6, collegeMatcher);
+        
+        if (stepResult === 'success') {
+            console.log(`[${sessionId}] 🎉 [${countryConfig.flag}] Already success with EXACT match!`);
+            const spotifyUrl = await session.getSpotifyUrl();
+            
+            if (spotifyUrl) {
+                const result = { student, url: spotifyUrl, type: 'already_success_exact', college: college.name };
+                saveSpotifyUrl(student, spotifyUrl, session.verificationId, countryConfig, session.getUploadStats());
+                deleteManager.markStudentSuccess(student.studentId);
+                collegeMatcher.addSuccess();
+                statsTracker.recordSuccess(result);
+                statsTracker.recordCollegeAttempt(college.id, college.name, true);
+                return result;
+            }
         }
         
-        if (stepResult === 'invalid_college' || stepResult === 'error') {
-            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] INVALID COLLEGE or ERROR`);
+        if (stepResult === 'invalid_college') {
+            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] INVALID EXACT COLLEGE - NO FALLBACK`);
             deleteManager.markStudentFailed(student.studentId);
             collegeMatcher.addFailure();
             statsTracker.recordFailureReason('invalidCollege');
@@ -1438,8 +1103,10 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
             return null;
         }
         
-        // ✅ MODIFIED: Force proceed to upload even if SSO succeeded
-        if (stepResult !== 'docUpload' && !ssoInstantSuccess && !ssoAlreadySuccess) {
+        // STEP 5: Handle SSO or docUpload - attempt upload for both
+        const shouldAttemptUpload = (stepResult === 'docUpload' || stepResult === 'sso');
+        
+        if (!shouldAttemptUpload) {
             console.log(`[${sessionId}] ❌ [${countryConfig.flag}] Cannot proceed - step: ${stepResult}`);
             deleteManager.markStudentFailed(student.studentId);
             collegeMatcher.addFailure();
@@ -1447,11 +1114,31 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
             return null;
         }
         
-        // STEP 5: Find all student files
+        if (stepResult === 'sso') {
+            console.log(`[${sessionId}] 🔐 [${countryConfig.flag}] SSO COLLEGE detected - Will attempt document upload anyway`);
+        }
+        
+        // STEP 6: Find all student files
         const files = findStudentFiles(student.studentId);
         if (files.length === 0) {
-            console.log(`[${sessionId}] ⚠️ [${countryConfig.flag}] No files found for ${ssoInstantSuccess || ssoAlreadySuccess ? 'forced ' : ''}upload`);
-
+            console.log(`[${sessionId}] ❌ [${countryConfig.flag}] No files found for upload`);
+            
+            // For SSO colleges, generate URL even without upload
+            if (stepResult === 'sso') {
+                console.log(`[${sessionId}] 🔐 [${countryConfig.flag}] SSO college with no files - generating URL anyway`);
+                const spotifyUrl = await session.getSpotifyUrl();
+                
+                if (spotifyUrl) {
+                    const result = { student, url: spotifyUrl, type: 'sso_no_upload', college: college.name };
+                    saveSpotifyUrl(student, spotifyUrl, session.verificationId, countryConfig, session.getUploadStats());
+                    deleteManager.markStudentSso(student.studentId);
+                    collegeMatcher.addSuccess();
+                    statsTracker.recordSuccess(result);
+                    statsTracker.recordCollegeAttempt(college.id, college.name, true);
+                    return result;
+                }
+            }
+            
             deleteManager.markStudentFailed(student.studentId);
             collegeMatcher.addFailure();
             statsTracker.recordFailureReason('noFiles');
@@ -1459,45 +1146,61 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
             return null;
         }
         
-        console.log(`[${sessionId}] 📁 [${countryConfig.flag}] Found ${files.length} file(s) for ${ssoInstantSuccess || ssoAlreadySuccess ? 'FORCE' : ''} upload`);
+        console.log(`[${sessionId}] 📁 [${countryConfig.flag}] Found ${files.length} file(s) for upload - will retry all if needed`);
         
-        // STEP 6: Try uploading ALL files until legitimate verification success
+        // STEP 7: Try uploading ALL files until success
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const attemptNumber = i + 1;
             
-            console.log(`[${sessionId}] 📤 [${countryConfig.flag}] ${ssoInstantSuccess || ssoAlreadySuccess ? 'FORCE ' : ''}Upload attempt ${attemptNumber}/${files.length}: ${file.name}`);
+            console.log(`[${sessionId}] 📤 [${countryConfig.flag}] Attempting upload ${attemptNumber}/${files.length}: ${file.name}`);
             
             const uploadResult = await session.uploadDocument(file.path, attemptNumber);
             
             if (uploadResult.success) {
-                console.log(`[${sessionId}] ✅ [${countryConfig.flag}] Upload ${attemptNumber} successful! Waiting ${CONFIG.verificationTimeout}s for LEGITIMATE verification...`);
+                console.log(`[${sessionId}] ✅ [${countryConfig.flag}] Upload ${attemptNumber} successful! Waiting ${CONFIG.verificationTimeout}s for verification...`);
                 collegeMatcher.incrementUploadRetry();
                 
-                // ✅ CRITICAL: Wait for LEGITIMATE verification status
+                // Wait for verification status with 20-second timeout
                 const statusResult = await session.checkStatus(CONFIG.verificationTimeout);
                 
-                // ✅ ONLY SAVE IF LEGITIMATELY VERIFIED - NO FAKE LINKS
                 if (statusResult.status === 'SUCCESS') {
-                    console.log(`[${sessionId}] 🎉 [${countryConfig.flag}] LEGITIMATE Verification SUCCESS after upload ${attemptNumber}!`);
-                    const verificationUrl = await session.getVerificationUrl();
-
-                    if (verificationUrl) {
-                        const successType = ssoInstantSuccess || ssoAlreadySuccess ? 'sso_force_upload' : 'upload_exact';
-                        const result = {
-                            student,
-                            url: verificationUrl,
-                            type: successType,
+                    console.log(`[${sessionId}] 🎉 [${countryConfig.flag}] Verification SUCCESS with EXACT match after upload ${attemptNumber}!`);
+                    const spotifyUrl = await session.getSpotifyUrl();
+                    
+                    if (spotifyUrl) {
+                        const result = { 
+                            student, 
+                            url: spotifyUrl, 
+                            type: 'upload_exact', 
                             college: college.name,
                             fileUsed: file.name,
                             uploadAttempt: attemptNumber,
-                            waitTime: statusResult.waitTime,
-                            ssoForced: ssoInstantSuccess || ssoAlreadySuccess
+                            waitTime: statusResult.waitTime
                         };
-
-                        // ✅ SAVE ONLY LEGITIMATE VERIFIED LINKS - NO FAKE LINKS
-                        saveVerificationUrl(student, verificationUrl, session.verificationId, countryConfig, session.getUploadStats());
+                        saveSpotifyUrl(student, spotifyUrl, session.verificationId, countryConfig, session.getUploadStats());
                         deleteManager.markStudentSuccess(student.studentId);
+                        collegeMatcher.addSuccess();
+                        statsTracker.recordSuccess(result);
+                        statsTracker.recordCollegeAttempt(college.id, college.name, true);
+                        return result;
+                    }
+                } else if (statusResult.status === 'SSO') {
+                    console.log(`[${sessionId}] 🔐 [${countryConfig.flag}] SSO required after upload ${attemptNumber} - generating URL anyway`);
+                    const spotifyUrl = await session.getSpotifyUrl();
+                    
+                    if (spotifyUrl) {
+                        const result = { 
+                            student, 
+                            url: spotifyUrl, 
+                            type: 'upload_sso', 
+                            college: college.name,
+                            fileUsed: file.name,
+                            uploadAttempt: attemptNumber,
+                            waitTime: statusResult.waitTime
+                        };
+                        saveSpotifyUrl(student, spotifyUrl, session.verificationId, countryConfig, session.getUploadStats());
+                        deleteManager.markStudentSso(student.studentId);
                         collegeMatcher.addSuccess();
                         statsTracker.recordSuccess(result);
                         statsTracker.recordCollegeAttempt(college.id, college.name, true);
@@ -1506,29 +1209,50 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
                 } else if (statusResult.status === 'REJECTED') {
                     console.log(`[${sessionId}] ❌ [${countryConfig.flag}] Document ${attemptNumber} rejected after ${statusResult.waitTime}s - trying next file...`);
                     collegeMatcher.incrementUploadRetry();
-                    continue;
+                    continue; // Try next file
                 } else if (statusResult.status === 'TIMEOUT') {
                     console.log(`[${sessionId}] ⏰ [${countryConfig.flag}] Verification timeout after upload ${attemptNumber} - trying next file...`);
                     collegeMatcher.incrementUploadRetry();
-                    continue;
+                    continue; // Try next file
                 }
                 
             } else {
                 console.log(`[${sessionId}] ❌ [${countryConfig.flag}] Upload ${attemptNumber} failed: ${uploadResult.reason} - trying next file...`);
                 collegeMatcher.incrementUploadRetry();
-                continue;
+                continue; // Try next file
             }
         }
         
-        // STEP 7: All uploads exhausted
-        console.log(`[${sessionId}] ❌ [${countryConfig.flag}] All ${files.length} file(s) exhausted - NO LEGITIMATE VERIFICATION`);
-
+        // STEP 8: All uploads exhausted
+        console.log(`[${sessionId}] ❌ [${countryConfig.flag}] All ${files.length} file(s) exhausted with EXACT college`);
+        
+        // For SSO colleges, generate URL even if uploads failed
+        if (stepResult === 'sso') {
+            console.log(`[${sessionId}] 🔐 [${countryConfig.flag}] SSO college - generating URL after all upload attempts`);
+            const spotifyUrl = await session.getSpotifyUrl();
+            
+            if (spotifyUrl) {
+                const result = { 
+                    student, 
+                    url: spotifyUrl, 
+                    type: 'sso_failed_uploads', 
+                    college: college.name,
+                    uploadAttempts: files.length
+                };
+                saveSpotifyUrl(student, spotifyUrl, session.verificationId, countryConfig, session.getUploadStats());
+                deleteManager.markStudentSso(student.studentId);
+                collegeMatcher.addSuccess();
+                statsTracker.recordSuccess(result);
+                statsTracker.recordCollegeAttempt(college.id, college.name, true);
+                return result;
+            }
+        }
+        
         deleteManager.markStudentRejected(student.studentId);
         collegeMatcher.addFailure();
         statsTracker.recordCollegeAttempt(college.id, college.name, false);
-
         return null;
-
+        
     } catch (error) {
         console.log(`[${sessionId}] ❌ [${countryConfig.flag}] Process error: ${error.message}`);
         deleteManager.markStudentFailed(student.studentId);
@@ -1544,27 +1268,25 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
 async function processBulk(students, collegeMatcher, deleteManager, countryConfig, targetLinks, statsTracker) {
     console.log(chalk.cyan(`
 ╔══════════════════════════════════════════════════════════════════╗
-║     🚀 MULTI-COUNTRY MODE - ${CONFIG.maxConcurrent} CONCURRENT WORKERS 🚀          ║
-║            Program ID: ${countryConfig.programId}              ║
-║            Country: ${countryConfig.flag} ${countryConfig.name.padEnd(25)} ║
-║            Source: ONLY ${countryConfig.collegesFile.padEnd(20)} ║
-║            Upload: Force upload even for SSO success            ║
+║     🚀 SMART WORK MODE - TARGET-BASED PROCESSING 🚀             ║
+║            Mode: EXACT ONLY - NO FALLBACKS - ${CONFIG.maxConcurrent} CONCURRENT       ║
+║            Source: ONLY ${countryConfig.collegesFile} EXACT MATCHES          ║
+║            Upload: Retry all files + 20s timeout + SSO handling  ║
 ║            Target: ${targetLinks.toString().padStart(4)} links to generate                        ║
 ╚══════════════════════════════════════════════════════════════════╝
 `));
     
     console.log(chalk.blue(`🌍 Country: ${countryConfig.flag} ${countryConfig.name} (${countryConfig.code.toUpperCase()})`));
-    console.log(chalk.blue(`🆔 Program ID: ${countryConfig.programId}`));
     console.log(chalk.blue(`👥 Students: ${students.length}`));
     console.log(chalk.green(`🎯 Target: ${targetLinks} links`));
     console.log(chalk.blue(`⚡ Concurrent: ${CONFIG.maxConcurrent} workers`));
     console.log(chalk.green(`📚 Source: ONLY ${countryConfig.collegesFile} - EXACT MATCHES ONLY`));
     console.log(chalk.red(`⛔ NO FALLBACK: Students without exact matches will be skipped`));
-    console.log(chalk.yellow(`🔄 FORCE UPLOAD: Will upload files even for SSO success`));
+    console.log(chalk.blue(`🔐 SSO SUPPORT: Upload attempts + URL generation for SSO colleges`));
+    console.log(chalk.yellow(`🔄 UPLOAD RETRY: Will try all available files if first fails`));
     console.log(chalk.yellow(`⏱️ VERIFICATION TIMEOUT: ${CONFIG.verificationTimeout} seconds after each upload`));
     console.log(chalk.red(`🗑️ Auto-delete: Immediate cleanup after processing`));
     console.log(chalk.green(`📁 Output: ${CONFIG.outputFile}`));
-    console.log(chalk.red(`🔒 NO FAKE LINKS: Only legitimate verified links saved`));
     
     const results = [];
     const chunks = [];
@@ -1622,7 +1344,7 @@ async function processBulk(students, collegeMatcher, deleteManager, countryConfi
             
             const stats = collegeMatcher.getStats();
             const percentage = ((results.length / targetLinks) * 100).toFixed(1);
-            console.log(chalk.blue(`📊 [${countryConfig.flag}] Progress: ${results.length}/${targetLinks} (${percentage}%) | Retries: ${stats.uploadRetries}`));
+            console.log(chalk.blue(`📊 [${countryConfig.flag}] Progress: ${results.length}/${targetLinks} (${percentage}%) | Retries: ${stats.uploadRetries} | SSO: ${stats.ssoColleges}`));
             
             if (batchChunks.indexOf(chunk) < batchChunks.length - 1) {
                 await new Promise(resolve => setTimeout(resolve, 500));
@@ -1652,8 +1374,6 @@ function displayDetailedAnalysis(analysis, countryConfig, matcherStats) {
     console.log(chalk.yellow('═══════════════════════════════════════════════════════════════════'));
     console.log(chalk.cyan('📈 OVERALL STATISTICS'));
     console.log(chalk.yellow('═══════════════════════════════════════════════════════════════════'));
-    console.log(chalk.blue(`🌍 Country: ${countryConfig.flag} ${countryConfig.name}`));
-    console.log(chalk.blue(`🆔 Program ID: ${countryConfig.programId}`));
     console.log(chalk.green(`✅ Total Success: ${analysis.totalSuccess} links`));
     console.log(chalk.blue(`⏱️  Total Time: ${analysis.totalTime.toFixed(2)} seconds`));
     console.log(chalk.blue(`⚡ Average Time per Link: ${analysis.avgTimePerLink}s`));
@@ -1669,23 +1389,29 @@ function displayDetailedAnalysis(analysis, countryConfig, matcherStats) {
     const successTypes = analysis.successTypes;
     const total = analysis.totalSuccess;
     
-    if (total > 0) {
-        if (successTypes.instant_exact > 0) {
-            const pct = ((successTypes.instant_exact / total) * 100).toFixed(1);
-            console.log(chalk.green(`⚡ Instant Success (No Upload): ${successTypes.instant_exact} (${pct}%)`));
-        }
-        if (successTypes.already_success_exact > 0) {
-            const pct = ((successTypes.already_success_exact / total) * 100).toFixed(1);
-            console.log(chalk.green(`✨ Already Success (No Upload): ${successTypes.already_success_exact} (${pct}%)`));
-        }
-        if (successTypes.upload_exact > 0) {
-            const pct = ((successTypes.upload_exact / total) * 100).toFixed(1);
-            console.log(chalk.green(`📤 Upload Success (Regular): ${successTypes.upload_exact} (${pct}%)`));
-        }
-        if (successTypes.sso_force_upload > 0) {
-            const pct = ((successTypes.sso_force_upload / total) * 100).toFixed(1);
-            console.log(chalk.cyan(`🔄 SSO Force Upload Success: ${successTypes.sso_force_upload} (${pct}%)`));
-        }
+    if (successTypes.instant_exact > 0) {
+        const pct = ((successTypes.instant_exact / total) * 100).toFixed(1);
+        console.log(chalk.green(`⚡ Instant Success: ${successTypes.instant_exact} (${pct}%)`));
+    }
+    if (successTypes.already_success_exact > 0) {
+        const pct = ((successTypes.already_success_exact / total) * 100).toFixed(1);
+        console.log(chalk.green(`✨ Already Success: ${successTypes.already_success_exact} (${pct}%)`));
+    }
+    if (successTypes.upload_exact > 0) {
+        const pct = ((successTypes.upload_exact / total) * 100).toFixed(1);
+        console.log(chalk.green(`📤 Upload Success: ${successTypes.upload_exact} (${pct}%)`));
+    }
+    if (successTypes.upload_sso > 0) {
+        const pct = ((successTypes.upload_sso / total) * 100).toFixed(1);
+        console.log(chalk.blue(`🔐 SSO with Upload: ${successTypes.upload_sso} (${pct}%)`));
+    }
+    if (successTypes.sso_no_upload > 0) {
+        const pct = ((successTypes.sso_no_upload / total) * 100).toFixed(1);
+        console.log(chalk.blue(`🔐 SSO No Upload: ${successTypes.sso_no_upload} (${pct}%)`));
+    }
+    if (successTypes.sso_failed_uploads > 0) {
+        const pct = ((successTypes.sso_failed_uploads / total) * 100).toFixed(1);
+        console.log(chalk.blue(`🔐 SSO Failed Uploads: ${successTypes.sso_failed_uploads} (${pct}%)`));
     }
     
     // UPLOAD STATISTICS
@@ -1744,6 +1470,7 @@ function displayDetailedAnalysis(analysis, countryConfig, matcherStats) {
     console.log(chalk.cyan('🏫 COLLEGE STATISTICS'));
     console.log(chalk.yellow('═══════════════════════════════════════════════════════════════════'));
     console.log(chalk.green(`✅ Working Colleges: ${matcherStats.workingColleges}`));
+    console.log(chalk.blue(`🔐 SSO Colleges: ${matcherStats.ssoColleges}`));
     console.log(chalk.red(`❌ Invalid Colleges: ${matcherStats.invalidColleges}`));
     console.log(chalk.blue(`📚 Total Colleges Loaded: ${matcherStats.totalColleges}`));
     
@@ -1769,10 +1496,7 @@ function displayDetailedAnalysis(analysis, countryConfig, matcherStats) {
 // MAIN FUNCTION
 async function main() {
     console.clear();
-    console.log(chalk.cyan('🎵 Spotify SheerID - MULTI-COUNTRY MODE (24 COUNTRIES)'));
-    console.log(chalk.green('🌍 All countries use the same program ID: 67c8c14f5f17a83b745e3f82'));
-    console.log(chalk.yellow('🔒 100% LEGITIMATE - No fake links, only verified links'));
-    console.log(chalk.cyan('🔄 FORCE UPLOAD - Files uploaded even for SSO success'));
+    console.log(chalk.cyan('🎵 Spotify SheerID - SMART WORK MODE WITH TARGET & ANALYSIS'));
     
     try {
         // SELECT COUNTRY
@@ -1783,12 +1507,10 @@ async function main() {
         CONFIG.countryConfig = countryConfig;
         
         console.log(chalk.green(`\n✅ Selected Country: ${countryConfig.flag} ${countryConfig.name} (${countryConfig.code.toUpperCase()})`));
-        console.log(chalk.blue(`🆔 Program ID: ${countryConfig.programId}`));
         console.log(chalk.blue(`📚 Using colleges file: ${countryConfig.collegesFile}`));
-        console.log(chalk.red(`⛔ LEGIT ONLY: Only exact JSON matches will be processed`));
-        console.log(chalk.yellow(`🔄 FORCE UPLOAD: Files will be uploaded even for SSO success`));
+        console.log(chalk.red(`⛔ NO FALLBACK MODE: Only exact JSON matches will be processed`));
+        console.log(chalk.yellow(`🔄 UPLOAD RETRY: Will try all available files`));
         console.log(chalk.yellow(`⏱️ TIMEOUT: ${CONFIG.verificationTimeout} seconds after each upload`));
-        console.log(chalk.red(`🔒 NO FAKE LINKS: Only legitimate verified links saved`));
         
         // Initialize college matcher with country config
         const collegeMatcher = new ExactJsonCollegeMatcher(countryConfig);
@@ -1828,7 +1550,7 @@ async function main() {
         const targetLinks = await askTargetLinks(studentsWithExactMatches.length);
         CONFIG.targetLinks = targetLinks;
         
-        console.log(chalk.cyan(`\n🚀 Starting multi-country processing with target: ${targetLinks} links\n`));
+        console.log(chalk.cyan(`\n🚀 Starting smart work processing with target: ${targetLinks} links\n`));
         
         const startTime = Date.now();
         const results = await processBulk(studentsWithExactMatches, collegeMatcher, deleteManager, countryConfig, targetLinks, statsTracker);
@@ -1849,8 +1571,7 @@ async function main() {
 ║              Upload Retries: ${stats.uploadRetries.toString().padStart(4)}                           ║
 ║              All links saved to ${CONFIG.outputFile.padEnd(15)}              ║
 ║              Processing Time: ${totalTime.toFixed(1)} seconds                ║
-║              📚 Source: ONLY ${countryConfig.collegesFile} (LEGIT)        ║
-║              🔒 NO FAKE LINKS - All verified                     ║
+║              📚 Source: ONLY ${countryConfig.collegesFile} + NO FALLBACK   ║
 ╚══════════════════════════════════════════════════════════════════╝
 `));
         
@@ -1864,10 +1585,10 @@ async function main() {
             console.log(chalk.blue(`⚡ Average Rate: ${(results.length / totalTime).toFixed(2)} links/second`));
             console.log(chalk.blue(`📚 Total Colleges: ${stats.totalColleges} loaded`));
             console.log(chalk.green(`✅ Exact Matches Found: ${stats.exactMatches}`));
+            console.log(chalk.blue(`🔐 SSO Colleges: ${stats.ssoColleges} detected`));
             console.log(chalk.green(`✅ Working Colleges: ${stats.workingColleges} confirmed`));
             console.log(chalk.red(`❌ Invalid Colleges: ${stats.invalidColleges} marked`));
             console.log(chalk.yellow(`🔄 Upload Retries: ${stats.uploadRetries} total attempts`));
-            console.log(chalk.cyan(`🔄 SSO Force Uploads: ${analysis.successTypes.sso_force_upload} successful`));
             
             if (CONFIG.targetReached) {
                 console.log(chalk.green(`\n🎯 TARGET ACHIEVED! Successfully generated ${results.length} links as requested.`));
@@ -1900,22 +1621,18 @@ process.on('SIGINT', () => {
 
 // STARTUP MESSAGE
 console.log(chalk.cyan(`
-🔍 GOOGLE SHEERID - MULTI-COUNTRY MODE (24 COUNTRIES SUPPORTED)
-🌍 Program ID: 67c8c14f5f17a83b745e3f82 (Same for ALL countries)
-🔒 100% LEGITIMATE - No fake links, only verified links
+🎵 SPOTIFY SHEERID - SMART WORK MODE WITH TARGET & DETAILED ANALYSIS 🎵
+🌍 Multi-country processing with EXACT college matching from JSON
+🎯 TARGET-BASED: Set your goal and auto-stop when reached
+📊 DETAILED ANALYSIS: Comprehensive statistics and breakdowns
 📚 Source: Reads country-specific JSON files - EXACT MATCHES ONLY
 ⛔ NO FALLBACK: Students without exact matches are skipped
-🔄 FORCE UPLOAD: Files uploaded even for SSO success
+🔄 ENHANCED RETRY: Tries all available files if first upload fails
 ⏱️ SMART TIMEOUT: ${CONFIG.verificationTimeout}s verification wait after each upload
+🔐 SSO SUPPORT: Attempts uploads + generates URLs for SSO colleges
 📤 BULK: ${CONFIG.maxConcurrent} concurrent workers, ${CONFIG.batchSize} batch size
 🗑️ DELETE: Immediate cleanup of processed students and receipts
-🔗 Generates: https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId=ID
-🔒 NO FAKE LINKS: Only legitimately verified links are saved
-
-SUPPORTED COUNTRIES (24):
-🇺🇸 US  🇨🇦 CA  🇬🇧 GB  🇮🇳 IN  🇮🇩 ID  🇦🇺 AU  🇩🇪 DE  🇫🇷 FR
-🇪🇸 ES  🇮🇹 IT  🇧🇷 BR  🇲🇽 MX  🇳🇱 NL  🇸🇪 SE  🇳🇴 NO  🇩🇰 DK
-🇯🇵 JP  🇰🇷 KR  🇸🇬 SG  🇳🇿 NZ  🇿🇦 ZA  🇨🇳 CN  🇦🇪 AE  🇵🇭 PH
+🔗 Generates: spotify.com/student/apply/sheerid-program?verificationId=ID
 `));
 
 // RUN MAIN FUNCTION
@@ -1932,7 +1649,7 @@ module.exports = {
     COUNTRIES,
     ExactJsonCollegeMatcher,
     ImmediateDeleteManager,
-    VerificationSession,
+    FixedVerificationSession,
     StatisticsTracker,
     processStudent,
     processBulk,
@@ -1942,7 +1659,7 @@ module.exports = {
     generateDOB,
     loadStudents,
     findStudentFiles,
-    saveVerificationUrl,
+    saveSpotifyUrl,
     displayDetailedAnalysis,
     main
 };
