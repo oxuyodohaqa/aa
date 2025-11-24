@@ -30,6 +30,8 @@ const CONFIG = {
     retryAllFilesOnFailure: true
 };
 
+const FINAL_LINK_TEMPLATE = 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId={verificationId}&utm_source=gemini&utm_medium=web&utm_campaign=advmktgsite';
+
 // COUNTRY CONFIGURATIONS - ALL 24 COUNTRIES WITH SAME PROGRAM ID
 const COUNTRIES = {
     'US': {
@@ -39,13 +41,13 @@ const COUNTRIES = {
         currency: 'USD',
         flag: '🇺🇸',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=us&locale=en-us',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=us&locale=en-us',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_us.json'
     },
     'CA': {
@@ -55,13 +57,13 @@ const COUNTRIES = {
         currency: 'CAD',
         flag: '🇨🇦',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=ca&locale=en-ca',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=ca&locale=en-ca',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_ca.json'
     },
     'GB': {
@@ -71,13 +73,13 @@ const COUNTRIES = {
         currency: 'GBP',
         flag: '🇬🇧',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=gb&locale=en-gb',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=gb&locale=en-gb',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_gb.json'
     },
     'IN': {
@@ -87,13 +89,13 @@ const COUNTRIES = {
         currency: 'INR',
         flag: '🇮🇳',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=in&locale=en-in',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=in&locale=en-in',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_in.json'
     },
     'ID': {
@@ -103,13 +105,13 @@ const COUNTRIES = {
         currency: 'IDR',
         flag: '🇮🇩',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=id&locale=id-id',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=id&locale=id-id',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_id.json'
     },
     'AU': {
@@ -119,13 +121,13 @@ const COUNTRIES = {
         currency: 'AUD',
         flag: '🇦🇺',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=au&locale=en-au',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=au&locale=en-au',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_au.json'
     },
     'DE': {
@@ -135,13 +137,13 @@ const COUNTRIES = {
         currency: 'EUR',
         flag: '🇩🇪',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=de&locale=de-de',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=de&locale=de-de',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_de.json'
     },
     'FR': {
@@ -151,13 +153,13 @@ const COUNTRIES = {
         currency: 'EUR',
         flag: '🇫🇷',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=fr&locale=fr-fr',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=fr&locale=fr-fr',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_fr.json'
     },
     'ES': {
@@ -167,13 +169,13 @@ const COUNTRIES = {
         currency: 'EUR',
         flag: '🇪🇸',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=es&locale=es-es',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=es&locale=es-es',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_es.json'
     },
     'IT': {
@@ -183,13 +185,13 @@ const COUNTRIES = {
         currency: 'EUR',
         flag: '🇮🇹',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=it&locale=it-it',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=it&locale=it-it',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_it.json'
     },
     'BR': {
@@ -199,13 +201,13 @@ const COUNTRIES = {
         currency: 'BRL',
         flag: '🇧🇷',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=br&locale=pt-br',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=br&locale=pt-br',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_br.json'
     },
     'MX': {
@@ -215,13 +217,13 @@ const COUNTRIES = {
         currency: 'MXN',
         flag: '🇲🇽',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=mx&locale=es-mx',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=mx&locale=es-mx',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_mx.json'
     },
     'NL': {
@@ -231,13 +233,13 @@ const COUNTRIES = {
         currency: 'EUR',
         flag: '🇳🇱',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=nl&locale=nl-nl',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=nl&locale=nl-nl',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_nl.json'
     },
     'SE': {
@@ -247,13 +249,13 @@ const COUNTRIES = {
         currency: 'SEK',
         flag: '🇸🇪',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=se&locale=sv-se',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=se&locale=sv-se',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_se.json'
     },
     'NO': {
@@ -263,13 +265,13 @@ const COUNTRIES = {
         currency: 'NOK',
         flag: '🇳🇴',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=no&locale=no-no',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=no&locale=no-no',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_no.json'
     },
     'DK': {
@@ -279,13 +281,13 @@ const COUNTRIES = {
         currency: 'DKK',
         flag: '🇩🇰',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=dk&locale=da-dk',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=dk&locale=da-dk',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_dk.json'
     },
     'JP': {
@@ -295,13 +297,13 @@ const COUNTRIES = {
         currency: 'JPY',
         flag: '🇯🇵',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=jp&locale=ja-jp',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=jp&locale=ja-jp',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_jp.json'
     },
     'KR': {
@@ -311,13 +313,13 @@ const COUNTRIES = {
         currency: 'KRW',
         flag: '🇰🇷',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=kr&locale=ko-kr',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=kr&locale=ko-kr',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_kr.json'
     },
     'SG': {
@@ -327,13 +329,13 @@ const COUNTRIES = {
         currency: 'SGD',
         flag: '🇸🇬',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=sg&locale=en-sg',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=sg&locale=en-sg',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_sg.json'
     },
     'NZ': {
@@ -343,13 +345,13 @@ const COUNTRIES = {
         currency: 'NZD',
         flag: '🇳🇿',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=nz&locale=en-nz',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=nz&locale=en-nz',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_nz.json'
     },
     'ZA': {
@@ -359,13 +361,13 @@ const COUNTRIES = {
         currency: 'ZAR',
         flag: '🇿🇦',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=za&locale=en-za',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=za&locale=en-za',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_za.json'
     },
     'CN': {
@@ -375,13 +377,13 @@ const COUNTRIES = {
         currency: 'CNY',
         flag: '🇨🇳',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=cn&locale=zh-cn',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=cn&locale=zh-cn',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_cn.json'
     },
     'AE': {
@@ -391,13 +393,13 @@ const COUNTRIES = {
         currency: 'AED',
         flag: '🇦🇪',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=ae&locale=en-ae',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=ae&locale=en-ae',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_ae.json'
     },
     'PH': {
@@ -407,13 +409,13 @@ const COUNTRIES = {
         currency: 'PHP',
         flag: '🇵🇭',
         domains: ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'],
-        programId: '63fd266996552d469aea40e1',
-        sheeridUrl: 'https://services.sheerid.com/verify/63fd266996552d469aea40e1/?country=ph&locale=en-ph',
-        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/63fd266996552d469aea40e1/step/collectStudentPersonalInfo',
+        programId: '67c8c14f5f17a83b745e3f82',
+        sheeridUrl: 'https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?country=ph&locale=en-ph',
+        submitEndpoint: 'https://services.sheerid.com/rest/v2/verification/program/67c8c14f5f17a83b745e3f82/step/collectStudentPersonalInfo',
         uploadEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/step/docUpload',
         statusEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}',
         redirectEndpoint: 'https://services.sheerid.com/rest/v2/verification/{verificationId}/redirect',
-        finalLinkFormat: 'https://www.spotify.com/student/apply/sheerid-program?verificationId={verificationId}',
+        finalLinkFormat: FINAL_LINK_TEMPLATE,
         collegesFile: 'sheerid_ph.json'
     }
 };
@@ -441,7 +443,7 @@ function askQuestion(query) {
 
 // COUNTRY SELECTOR
 async function selectCountry() {
-    console.log(chalk.cyan('\n🌍 SELECT COUNTRY FOR SPOTIFY VERIFICATION:'));
+    console.log(chalk.cyan('\n🌍 SELECT COUNTRY FOR GOOGLE VERIFICATION:'));
     console.log(chalk.yellow('1 . United States        (US) | 2 . Canada               (CA)'));
     console.log(chalk.yellow('3 . United Kingdom       (GB) | 4 . India                (IN)'));
     console.log(chalk.yellow('5 . Indonesia            (ID) | 6 . Australia            (AU)'));
@@ -1155,39 +1157,61 @@ class VerificationSession {
         return { status: 'TIMEOUT', waitTime: maxWaitTime };
     }
     
-    async getSpotifyUrl() {
+    async getVerificationUrl() {
         if (!this.verificationId) return null;
-        
+
+        const finalLinkDomains = this.countryConfig.finalLinkDomains || [
+            'google.com',
+            'one.google.com',
+            'accounts.google.com',
+            'services.sheerid.com'
+        ];
         const endpoints = [
             this.countryConfig.redirectEndpoint.replace('{verificationId}', this.verificationId),
             `https://services.sheerid.com/redirect/${this.verificationId}`
         ];
-        
+
+        const urlMatchesTargetDomain = (url) => {
+            return finalLinkDomains.some(domain => url?.includes(domain));
+        };
+
+        const extractUrlFromContent = (content) => {
+            if (typeof content !== 'string') return null;
+            const urlRegex = /https?:\/\/[^"'<>\s]+/g;
+            const matches = content.match(urlRegex) || [];
+            return matches.find(url => urlMatchesTargetDomain(url)) || null;
+        };
+
+        const captureUrl = (response) => {
+            if (!response) return null;
+
+            const headerUrl = response.headers?.location || response.data?.redirectUrl;
+            if (urlMatchesTargetDomain(headerUrl)) return headerUrl;
+
+            const requestUrl = response.request?.res?.responseUrl || response.request?._redirectable?._currentUrl;
+            if (urlMatchesTargetDomain(requestUrl)) return requestUrl;
+
+            return extractUrlFromContent(response.data);
+        };
+
         for (const endpoint of endpoints) {
             try {
-                const response = await this.client.get(endpoint, { maxRedirects: 0 });
-                let url = response.headers.location || response.data?.redirectUrl;
-                
-                if (url && url.includes('spotify.com')) {
-                    if (!url.includes('verificationId=')) {
-                        const separator = url.includes('?') ? '&' : '?';
-                        url = `${url}${separator}verificationId=${this.verificationId}`;
-                    }
-                    return url;
-                }
+                // Try without following redirects so we can read Location headers
+                const headResponse = await this.client.get(endpoint, { maxRedirects: 0, validateStatus: () => true });
+                const headUrl = captureUrl(headResponse);
+                if (headUrl) return headUrl;
+
+                // Follow redirects to capture the final landing page URL or any embedded offer link
+                const followResponse = await this.client.get(endpoint, { maxRedirects: 5, validateStatus: () => true });
+                const followUrl = captureUrl(followResponse);
+                if (followUrl) return followUrl;
             } catch (error) {
-                if (error.response?.headers?.location?.includes('spotify.com')) {
-                    let url = error.response.headers.location;
-                    if (!url.includes('verificationId=')) {
-                        const separator = url.includes('?') ? '&' : '?';
-                        url = `${url}${separator}verificationId=${this.verificationId}`;
-                    }
-                    return url;
-                }
+                const errorUrl = captureUrl(error.response);
+                if (errorUrl) return errorUrl;
                 continue;
             }
         }
-        
+
         return this.countryConfig.finalLinkFormat.replace('{verificationId}', this.verificationId);
     }
     
@@ -1296,10 +1320,10 @@ function findStudentFiles(studentId) {
     return files.sort((a, b) => b.size - a.size);
 }
 
-function saveSpotifyUrl(student, url, verificationId, countryConfig, uploadStats = null) {
+function saveVerificationUrl(student, url, verificationId, countryConfig, uploadStats = null) {
     try {
         fs.appendFileSync(CONFIG.outputFile, url + '\n');
-        
+
         const logEntry = JSON.stringify({
             datetime: new Date().toISOString(),
             country: countryConfig.name,
@@ -1312,12 +1336,12 @@ function saveSpotifyUrl(student, url, verificationId, countryConfig, uploadStats
                 email: student.email
             },
             verificationId: verificationId,
-            spotifyUrl: url,
+            verificationUrl: url,
             matchType: 'EXACT_JSON_MATCH',
             uploadStats: uploadStats
         }) + '\n';
-        
-        fs.appendFileSync(`spotify_${countryConfig.code}_success.txt`, logEntry);
+
+        fs.appendFileSync(`verification_${countryConfig.code}_success.txt`, logEntry);
         console.log(chalk.green(`💾 [${countryConfig.flag}] SUCCESS: ${url}`));
         return true;
     } catch (error) {
@@ -1330,7 +1354,7 @@ function saveSpotifyUrl(student, url, verificationId, countryConfig, uploadStats
 async function processStudent(student, sessionId, collegeMatcher, deleteManager, countryConfig, statsTracker) {
     const session = new VerificationSession(sessionId, countryConfig);
     let college = null;
-    
+
     try {
         console.log(`[${sessionId}] 🎯 [${countryConfig.flag}] Processing ${student.firstName} ${student.lastName} (${student.studentId})`);
         
@@ -1367,7 +1391,7 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         // STEP 3: Submit personal info with exact college match
         const dob = generateDOB();
         const step = await session.submitPersonalInfo(student, dob, college);
-        
+
         // ✅ MODIFIED: Don't return early on instant success - continue to force upload
         let ssoInstantSuccess = false;
         if (step === 'success') {
@@ -1430,11 +1454,6 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         if (files.length === 0) {
             console.log(`[${sessionId}] ⚠️ [${countryConfig.flag}] No files found for ${ssoInstantSuccess || ssoAlreadySuccess ? 'forced ' : ''}upload`);
 
-            // ✅ Force policy: even with SSO success we require an upload
-            if (ssoInstantSuccess || ssoAlreadySuccess) {
-                console.log(`[${sessionId}] ❌ [${countryConfig.flag}] SSO success without files cannot be accepted — force upload required`);
-            }
-
             deleteManager.markStudentFailed(student.studentId);
             collegeMatcher.addFailure();
             statsTracker.recordFailureReason('noFiles');
@@ -1463,23 +1482,23 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
                 // ✅ ONLY SAVE IF LEGITIMATELY VERIFIED - NO FAKE LINKS
                 if (statusResult.status === 'SUCCESS') {
                     console.log(`[${sessionId}] 🎉 [${countryConfig.flag}] LEGITIMATE Verification SUCCESS after upload ${attemptNumber}!`);
-                    const spotifyUrl = await session.getSpotifyUrl();
-                    
-                    if (spotifyUrl) {
+                    const verificationUrl = await session.getVerificationUrl();
+
+                    if (verificationUrl) {
                         const successType = ssoInstantSuccess || ssoAlreadySuccess ? 'sso_force_upload' : 'upload_exact';
-                        const result = { 
-                            student, 
-                            url: spotifyUrl, 
-                            type: successType, 
+                        const result = {
+                            student,
+                            url: verificationUrl,
+                            type: successType,
                             college: college.name,
                             fileUsed: file.name,
                             uploadAttempt: attemptNumber,
                             waitTime: statusResult.waitTime,
                             ssoForced: ssoInstantSuccess || ssoAlreadySuccess
                         };
-                        
+
                         // ✅ SAVE ONLY LEGITIMATE VERIFIED LINKS - NO FAKE LINKS
-                        saveSpotifyUrl(student, spotifyUrl, session.verificationId, countryConfig, session.getUploadStats());
+                        saveVerificationUrl(student, verificationUrl, session.verificationId, countryConfig, session.getUploadStats());
                         deleteManager.markStudentSuccess(student.studentId);
                         collegeMatcher.addSuccess();
                         statsTracker.recordSuccess(result);
@@ -1505,11 +1524,13 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         
         // STEP 7: All uploads exhausted
         console.log(`[${sessionId}] ❌ [${countryConfig.flag}] All ${files.length} file(s) exhausted - NO LEGITIMATE VERIFICATION`);
+
         deleteManager.markStudentRejected(student.studentId);
         collegeMatcher.addFailure();
         statsTracker.recordCollegeAttempt(college.id, college.name, false);
+
         return null;
-        
+
     } catch (error) {
         console.log(`[${sessionId}] ❌ [${countryConfig.flag}] Process error: ${error.message}`);
         deleteManager.markStudentFailed(student.studentId);
@@ -1751,7 +1772,7 @@ function displayDetailedAnalysis(analysis, countryConfig, matcherStats) {
 async function main() {
     console.clear();
     console.log(chalk.cyan('🎵 Spotify SheerID - MULTI-COUNTRY MODE (24 COUNTRIES)'));
-    console.log(chalk.green('🌍 All countries use the same program ID: 63fd266996552d469aea40e1'));
+    console.log(chalk.green('🌍 All countries use the same program ID: 67c8c14f5f17a83b745e3f82'));
     console.log(chalk.yellow('🔒 100% LEGITIMATE - No fake links, only verified links'));
     console.log(chalk.cyan('🔄 FORCE UPLOAD - Files uploaded even for SSO success'));
     
@@ -1881,8 +1902,8 @@ process.on('SIGINT', () => {
 
 // STARTUP MESSAGE
 console.log(chalk.cyan(`
-🎵 SPOTIFY SHEERID - MULTI-COUNTRY MODE (24 COUNTRIES SUPPORTED) 🎵
-🌍 Program ID: 63fd266996552d469aea40e1 (Same for ALL countries)
+🔍 GOOGLE SHEERID - MULTI-COUNTRY MODE (24 COUNTRIES SUPPORTED)
+🌍 Program ID: 67c8c14f5f17a83b745e3f82 (Same for ALL countries)
 🔒 100% LEGITIMATE - No fake links, only verified links
 📚 Source: Reads country-specific JSON files - EXACT MATCHES ONLY
 ⛔ NO FALLBACK: Students without exact matches are skipped
@@ -1890,7 +1911,7 @@ console.log(chalk.cyan(`
 ⏱️ SMART TIMEOUT: ${CONFIG.verificationTimeout}s verification wait after each upload
 📤 BULK: ${CONFIG.maxConcurrent} concurrent workers, ${CONFIG.batchSize} batch size
 🗑️ DELETE: Immediate cleanup of processed students and receipts
-🔗 Generates: spotify.com/student/apply/sheerid-program?verificationId=ID
+🔗 Generates: https://services.sheerid.com/verify/67c8c14f5f17a83b745e3f82/?verificationId=ID
 🔒 NO FAKE LINKS: Only legitimately verified links are saved
 
 SUPPORTED COUNTRIES (24):
@@ -1923,7 +1944,7 @@ module.exports = {
     generateDOB,
     loadStudents,
     findStudentFiles,
-    saveSpotifyUrl,
+    saveVerificationUrl,
     displayDetailedAnalysis,
     main
 };
