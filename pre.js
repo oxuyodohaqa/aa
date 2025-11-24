@@ -1171,25 +1171,24 @@ class VerificationSession {
             `https://services.sheerid.com/redirect/${this.verificationId}`
         ];
 
-        const urlMatchesTargetDomain = (url) => {
-            return finalLinkDomains.some(domain => url?.includes(domain));
-        };
+        const urlMatchesTargetDomain = (url) => finalLinkDomains.some(domain => url?.includes(domain));
+        const urlContainsVerificationId = (url) => url?.includes(this.verificationId);
 
         const extractUrlFromContent = (content) => {
             if (typeof content !== 'string') return null;
             const urlRegex = /https?:\/\/[^"'<>\s]+/g;
             const matches = content.match(urlRegex) || [];
-            return matches.find(url => urlMatchesTargetDomain(url)) || null;
+            return matches.find(url => urlMatchesTargetDomain(url) || urlContainsVerificationId(url)) || null;
         };
 
         const captureUrl = (response) => {
             if (!response) return null;
 
             const headerUrl = response.headers?.location || response.data?.redirectUrl;
-            if (urlMatchesTargetDomain(headerUrl)) return headerUrl;
+            if (urlMatchesTargetDomain(headerUrl) || urlContainsVerificationId(headerUrl)) return headerUrl;
 
             const requestUrl = response.request?.res?.responseUrl || response.request?._redirectable?._currentUrl;
-            if (urlMatchesTargetDomain(requestUrl)) return requestUrl;
+            if (urlMatchesTargetDomain(requestUrl) || urlContainsVerificationId(requestUrl)) return requestUrl;
 
             return extractUrlFromContent(response.data);
         };
