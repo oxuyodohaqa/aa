@@ -1339,7 +1339,7 @@ function saveVerificationUrl(student, url, verificationId, countryConfig, upload
 async function processStudent(student, sessionId, collegeMatcher, deleteManager, countryConfig, statsTracker) {
     const session = new VerificationSession(sessionId, countryConfig);
     let college = null;
-    
+
     try {
         console.log(`[${sessionId}] 🎯 [${countryConfig.flag}] Processing ${student.firstName} ${student.lastName} (${student.studentId})`);
         
@@ -1376,7 +1376,7 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         // STEP 3: Submit personal info with exact college match
         const dob = generateDOB();
         const step = await session.submitPersonalInfo(student, dob, college);
-        
+
         // ✅ MODIFIED: Don't return early on instant success - continue to force upload
         let ssoInstantSuccess = false;
         if (step === 'success') {
@@ -1438,11 +1438,6 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         const files = findStudentFiles(student.studentId);
         if (files.length === 0) {
             console.log(`[${sessionId}] ⚠️ [${countryConfig.flag}] No files found for ${ssoInstantSuccess || ssoAlreadySuccess ? 'forced ' : ''}upload`);
-
-            // ✅ Force policy: even with SSO success we require an upload
-            if (ssoInstantSuccess || ssoAlreadySuccess) {
-                console.log(`[${sessionId}] ❌ [${countryConfig.flag}] SSO success without files cannot be accepted — force upload required`);
-            }
 
             deleteManager.markStudentFailed(student.studentId);
             collegeMatcher.addFailure();
@@ -1514,11 +1509,13 @@ async function processStudent(student, sessionId, collegeMatcher, deleteManager,
         
         // STEP 7: All uploads exhausted
         console.log(`[${sessionId}] ❌ [${countryConfig.flag}] All ${files.length} file(s) exhausted - NO LEGITIMATE VERIFICATION`);
+
         deleteManager.markStudentRejected(student.studentId);
         collegeMatcher.addFailure();
         statsTracker.recordCollegeAttempt(college.id, college.name, false);
+
         return null;
-        
+
     } catch (error) {
         console.log(`[${sessionId}] ❌ [${countryConfig.flag}] Process error: ${error.message}`);
         deleteManager.markStudentFailed(student.studentId);
