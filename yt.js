@@ -13,6 +13,9 @@ const CONFIG = {
     outputFile: 'sukses.txt'
 };
 
+// Verification ID regex pattern (24-character hex string)
+const VERIFICATION_ID_PATTERN = '[a-f0-9]{24}';
+
 // Common headers for SheerID API requests
 const SHEERID_HEADERS = {
     'Accept': 'application/json',
@@ -112,30 +115,23 @@ async function extractVerificationIdFromUrl(youtubeUrl) {
         
         // Try multiple patterns to find verificationId in the page
         // Pattern 1: verificationId in JSON data
-        let match = html.match(/"verificationId"\s*:\s*"([a-f0-9]{24})"/i);
+        let match = html.match(new RegExp(`"verificationId"\\s*:\\s*"(${VERIFICATION_ID_PATTERN})"`, 'i'));
         if (match) {
             console.log(chalk.green(`✅ Found verification ID in JSON: ${match[1]}`));
             return match[1];
         }
         
         // Pattern 2: verificationId in URL parameter
-        match = html.match(/verificationId[=:]([a-f0-9]{24})/i);
+        match = html.match(new RegExp(`verificationId[=:](${VERIFICATION_ID_PATTERN})`, 'i'));
         if (match) {
             console.log(chalk.green(`✅ Found verification ID in URL param: ${match[1]}`));
             return match[1];
         }
         
         // Pattern 3: Check for verification ID in window.__INITIAL_STATE__ or similar
-        match = html.match(/verificationId["']?\s*[:=]\s*["']?([a-f0-9]{24})["']?/i);
+        match = html.match(new RegExp(`verificationId["']?\\s*[:=]\\s*["']?(${VERIFICATION_ID_PATTERN})["']?`, 'i'));
         if (match) {
             console.log(chalk.green(`✅ Found verification ID in state: ${match[1]}`));
-            return match[1];
-        }
-        
-        // Pattern 4: Look for ID in API response embedded in page
-        match = html.match(/"id"\s*:\s*"([a-f0-9]{24})"/);
-        if (match) {
-            console.log(chalk.green(`✅ Found verification ID as 'id': ${match[1]}`));
             return match[1];
         }
         
