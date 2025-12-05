@@ -13,6 +13,16 @@ const CONFIG = {
     outputFile: 'sukses.txt'
 };
 
+// Common headers for SheerID API requests
+const SHEERID_HEADERS = {
+    'Accept': 'application/json',
+    'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Origin': 'https://offers.sheerid.com',
+    'Referer': 'https://offers.sheerid.com/youtube/student/',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36'
+};
+
 // Create readline interface
 const rl = readline.createInterface({
     input: process.stdin,
@@ -98,13 +108,9 @@ async function createYoutubeVerification(youtubeUrl) {
             data,
             {
                 headers: {
-                    'Accept': 'application/json',
-                    'Accept-Encoding': 'gzip, deflate, br, zstd',
-                    'Accept-Language': 'en-US,en;q=0.9',
+                    ...SHEERID_HEADERS,
                     'Content-Type': 'application/json',
-                    'Origin': 'https://offers.sheerid.com',
-                    'Referer': youtubeUrl,
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36'
+                    'Referer': youtubeUrl
                 }
             }
         );
@@ -138,17 +144,17 @@ async function getVerificationDetails(verificationId) {
             `https://services.sheerid.com/rest/v2/verification/${verificationId}`,
             {
                 timeout: 10000,
-                headers: { 'User-Agent': 'Mozilla/5.0' }
+                headers: SHEERID_HEADERS
             }
         );
-        console.log(chalk.cyan('🔍 Verification Details:'));
-        console.log(chalk.cyan(`Status: ${response.data.status}`));
-        console.log(chalk.cyan(`Current Step: ${response.data.currentStep}`));
-        console.log(chalk.cyan(`Segment: ${response.data.segment}`));
-        console.log(chalk.cyan(`Created: ${response.data.created}`));
+        console.log(chalk.cyan(`🔍 [${verificationId}] Verification Details:`));
+        console.log(chalk.cyan(`   Status: ${response.data.status || 'N/A'}`));
+        console.log(chalk.cyan(`   Current Step: ${response.data.currentStep}`));
+        console.log(chalk.cyan(`   Segment: ${response.data.segment || 'N/A'}`));
+        console.log(chalk.cyan(`   Created: ${response.data.created || 'N/A'}`));
         return response.data;
     } catch (e) {
-        console.log(chalk.red('❌ Failed to get verification details'));
+        console.log(chalk.red(`❌ [${verificationId}] Failed to get verification details: ${e.message}`));
         return null;
     }
 }
@@ -175,32 +181,37 @@ async function submitPersonalInfo(verificationId, student, college) {
             locale: 'en-PH'
         };
         
-        console.log(chalk.yellow('📝 Submitting personal info for YouTube...'));
+        console.log(chalk.yellow(`📝 [${verificationId}] Submitting personal info for YouTube...`));
+        console.log(chalk.blue(`📝 [${verificationId}] Student: ${student.firstName} ${student.lastName}`));
+        console.log(chalk.blue(`📝 [${verificationId}] College: ${college.name} (ID: ${college.id})`));
         
         const response = await axios.post(
             `https://services.sheerid.com/rest/v2/verification/${verificationId}/step/collectStudentPersonalInfo`,
             data,
             {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Mozilla/5.0'
+                    ...SHEERID_HEADERS,
+                    'Content-Type': 'application/json'
                 },
                 timeout: 30000
             }
         );
         
-        console.log(chalk.green(`✅ Personal info submitted!`));
-        console.log(chalk.green(`New step: ${response.data.currentStep}`));
+        console.log(chalk.green(`✅ [${verificationId}] Personal info submitted!`));
+        console.log(chalk.green(`📍 [${verificationId}] New step: ${response.data.currentStep}`));
         
         return {
             success: true,
-            currentStep: response.data.currentStep
+            currentStep: response.data.currentStep,
+            data: response.data
         };
     } catch (e) {
-        console.log(chalk.red('❌ Failed to submit personal info'));
+        console.log(chalk.red(`❌ [${verificationId}] Failed to submit personal info`));
         if (e.response) {
             console.log(chalk.red(`Status: ${e.response.status}`));
             console.log(chalk.red(`Error: ${JSON.stringify(e.response.data)}`));
+        } else {
+            console.log(chalk.red(`Error: ${e.message}`));
         }
         return { success: false };
     }
@@ -213,16 +224,16 @@ async function checkStatus(verificationId) {
             `https://services.sheerid.com/rest/v2/verification/${verificationId}`,
             {
                 timeout: 10000,
-                headers: { 'User-Agent': 'Mozilla/5.0' }
+                headers: SHEERID_HEADERS
             }
         );
         
-        console.log(chalk.blue(`📍 Current Step: ${response.data.currentStep}`));
+        console.log(chalk.blue(`📍 [${verificationId}] Current Step: ${response.data.currentStep}`));
         
         // Show more details if pending
         if (response.data.currentStep === 'pending') {
-            console.log(chalk.yellow(`⏳ Awaiting: ${response.data.awaitingStep || 'Unknown'}`));
-            console.log(chalk.yellow(`⏳ Estimated: ${response.data.estimatedReviewTime || 'Unknown'}`));
+            console.log(chalk.yellow(`⏳ [${verificationId}] Awaiting: ${response.data.awaitingStep || 'Unknown'}`));
+            console.log(chalk.yellow(`⏳ [${verificationId}] Estimated: ${response.data.estimatedReviewTime || 'Unknown'}`));
         }
         
         return { 
@@ -231,7 +242,7 @@ async function checkStatus(verificationId) {
             data: response.data 
         };
     } catch (e) {
-        console.log(chalk.red('❌ Could not check status'));
+        console.log(chalk.red(`❌ [${verificationId}] Could not check status: ${e.message}`));
         return { success: false };
     }
 }
@@ -239,21 +250,24 @@ async function checkStatus(verificationId) {
 // CANCEL SSO FOR YOUTUBE
 async function cancelSso(verificationId) {
     try {
-        console.log(chalk.yellow('🔄 Cancelling SSO for YouTube...'));
+        console.log(chalk.yellow(`🔄 [${verificationId}] Cancelling SSO for YouTube...`));
         const response = await axios.delete(
             `https://services.sheerid.com/rest/v2/verification/${verificationId}/step/sso`,
             {
                 timeout: 10000,
-                headers: { 'User-Agent': 'Mozilla/5.0' }
+                headers: SHEERID_HEADERS
             }
         );
-        console.log(chalk.green('✅ SSO cancelled'));
-        console.log(chalk.green(`New step: ${response.data.currentStep}`));
-        return { success: true, currentStep: response.data.currentStep };
+        console.log(chalk.green(`✅ [${verificationId}] SSO cancelled`));
+        console.log(chalk.green(`📍 [${verificationId}] New step: ${response.data.currentStep}`));
+        return { success: true, currentStep: response.data.currentStep, data: response.data };
     } catch (e) {
-        console.log(chalk.red('❌ SSO cancel failed'));
+        console.log(chalk.red(`❌ [${verificationId}] SSO cancel failed`));
         if (e.response) {
             console.log(chalk.red(`Status: ${e.response.status}`));
+            console.log(chalk.red(`Error: ${JSON.stringify(e.response.data)}`));
+        } else {
+            console.log(chalk.red(`Error: ${e.message}`));
         }
         return { success: false };
     }
@@ -262,7 +276,7 @@ async function cancelSso(verificationId) {
 // UPLOAD DOCUMENT
 async function uploadDocument(verificationId, filePath) {
     try {
-        console.log(chalk.yellow(`📤 Uploading: ${path.basename(filePath)}`));
+        console.log(chalk.yellow(`📤 [${verificationId}] Uploading: ${path.basename(filePath)}`));
         const formData = new FormData();
         formData.append('file', fs.createReadStream(filePath));
         
@@ -272,20 +286,22 @@ async function uploadDocument(verificationId, filePath) {
             {
                 headers: {
                     ...formData.getHeaders(),
-                    'User-Agent': 'Mozilla/5.0'
+                    ...SHEERID_HEADERS
                 },
                 timeout: 60000
             }
         );
         
-        console.log(chalk.green('✅ Upload successful!'));
-        console.log(chalk.green(`New step: ${response.data.currentStep}`));
-        return { success: true, data: response.data };
+        console.log(chalk.green(`✅ [${verificationId}] Upload successful!`));
+        console.log(chalk.green(`📍 [${verificationId}] New step: ${response.data.currentStep}`));
+        return { success: true, currentStep: response.data.currentStep, data: response.data };
     } catch (e) {
-        console.log(chalk.red('❌ Upload failed'));
+        console.log(chalk.red(`❌ [${verificationId}] Upload failed`));
         if (e.response) {
             console.log(chalk.red(`Status: ${e.response.status}`));
-            console.log(chalk.red(`Error: ${e.response.data?.message || 'Unknown error'}`));
+            console.log(chalk.red(`Error: ${JSON.stringify(e.response.data)}`));
+        } else {
+            console.log(chalk.red(`Error: ${e.message}`));
         }
         return { success: false };
     }
@@ -294,37 +310,57 @@ async function uploadDocument(verificationId, filePath) {
 // GET YOUTUBE PREMIUM URL
 async function getYoutubePremiumUrl(verificationId) {
     try {
-        console.log(chalk.yellow('🔗 Getting YouTube Premium URL...'));
+        console.log(chalk.yellow(`🔗 [${verificationId}] Getting YouTube Premium URL...`));
         const response = await axios.get(
             `https://services.sheerid.com/rest/v2/verification/${verificationId}/redirect`,
             { 
                 maxRedirects: 0, 
                 timeout: 10000,
-                validateStatus: null
+                // Accept both 2xx success codes and 3xx redirect codes to capture the location header
+                validateStatus: (status) => status >= 200 && status < 400,
+                headers: {
+                    ...SHEERID_HEADERS,
+                    'Accept': 'application/json, text/html, */*'
+                }
             }
         );
         
         if (response.headers.location) {
-            console.log(chalk.green(`✅ YouTube Premium URL obtained!`));
+            console.log(chalk.green(`✅ [${verificationId}] YouTube Premium URL obtained!`));
             return { success: true, url: response.headers.location };
         }
+        
+        // Check if redirectUrl is in the response data
+        if (response.data?.redirectUrl) {
+            console.log(chalk.green(`✅ [${verificationId}] YouTube Premium URL obtained from response data!`));
+            return { success: true, url: response.data.redirectUrl };
+        }
+        
+        console.log(chalk.yellow(`⚠️ [${verificationId}] No redirect URL in response`));
+        return { success: false };
     } catch (e) {
+        // Handle 302 redirect in error response
         if (e.response?.headers?.location) {
-            console.log(chalk.green(`✅ YouTube Premium URL obtained!`));
+            console.log(chalk.green(`✅ [${verificationId}] YouTube Premium URL obtained from redirect!`));
             return { success: true, url: e.response.headers.location };
         }
-        console.log(chalk.red('❌ Failed to get YouTube Premium URL'));
+        console.log(chalk.red(`❌ [${verificationId}] Failed to get YouTube Premium URL`));
+        if (e.response) {
+            console.log(chalk.red(`Status: ${e.response.status}`));
+        } else {
+            console.log(chalk.red(`Error: ${e.message}`));
+        }
+        return { success: false };
     }
-    return { success: false };
 }
 
 // SAVE RESULT
-function saveResult(url) {
+function saveResult(url, verificationId) {
     try {
         fs.appendFileSync(CONFIG.outputFile, url + '\n');
-        console.log(chalk.green(`💾 Saved to file: ${url}`));
+        console.log(chalk.green(`💾 [${verificationId}] Saved to ${CONFIG.outputFile}: ${url}`));
     } catch (e) {
-        console.log(chalk.red('❌ Save failed'));
+        console.log(chalk.red(`❌ [${verificationId}] Save failed: ${e.message}`));
     }
 }
 
@@ -334,12 +370,15 @@ async function processStudent(student, collegesMap, youtubeUrl) {
     
     // STEP 1: Create YouTube verification
     const verificationResult = await createYoutubeVerification(youtubeUrl);
-    if (!verificationResult.success) return null;
+    if (!verificationResult.success) {
+        console.log(chalk.red('❌ Failed to create verification'));
+        return null;
+    }
     
     const verificationId = verificationResult.verificationId;
     let currentStep = verificationResult.currentStep;
     
-    console.log(chalk.green(`🔑 YouTube Verification ID: ${verificationId}`));
+    console.log(chalk.green(`🔑 [${verificationId}] YouTube Verification ID obtained`));
     
     // Get verification details
     await getVerificationDetails(verificationId);
@@ -347,62 +386,71 @@ async function processStudent(student, collegesMap, youtubeUrl) {
     // Find files
     const files = findStudentFiles(student.studentId);
     if (files.length === 0) {
-        console.log(chalk.red('❌ No files found'));
+        console.log(chalk.red(`❌ [${verificationId}] No files found for student ${student.studentId}`));
         return null;
     }
     
-    console.log(chalk.blue(`📁 Found ${files.length} file(s)`));
+    console.log(chalk.blue(`📁 [${verificationId}] Found ${files.length} file(s)`));
     
     // Get college from file
     const firstFile = files[0];
     const collegeId = getCollegeIdFromFile(student.studentId, path.basename(firstFile));
     
     if (!collegeId) {
-        console.log(chalk.red('❌ Could not extract college ID'));
+        console.log(chalk.red(`❌ [${verificationId}] Could not extract college ID from filename`));
         return null;
     }
     
     const college = collegesMap.get(collegeId);
     if (!college) {
-        console.log(chalk.red(`❌ College ${collegeId} not found`));
+        console.log(chalk.red(`❌ [${verificationId}] College ID ${collegeId} not found in database`));
         return null;
     }
     
-    console.log(chalk.blue(`🏫 College: ${college.name}`));
+    console.log(chalk.blue(`🏫 [${verificationId}] College: ${college.name}`));
     
     // STEP 2: Submit personal info if needed
     if (currentStep === 'collectStudentPersonalInfo') {
-        console.log(chalk.yellow('🔄 Submitting personal info...'));
+        console.log(chalk.yellow(`🔄 [${verificationId}] Submitting personal info...`));
         const submitResult = await submitPersonalInfo(verificationId, student, college);
-        if (!submitResult.success) return null;
+        if (!submitResult.success) {
+            console.log(chalk.red(`❌ [${verificationId}] Failed to submit personal info`));
+            return null;
+        }
         
         currentStep = submitResult.currentStep;
         await new Promise(r => setTimeout(r, 3000));
-        await checkStatus(verificationId);
+        const statusCheck = await checkStatus(verificationId);
+        if (statusCheck.success) {
+            currentStep = statusCheck.currentStep;
+        }
     }
     
     // STEP 3: Handle SSO for YouTube
     if (currentStep === 'sso') {
-        console.log(chalk.yellow('🔐 YouTube requires Google SSO, cancelling...'));
+        console.log(chalk.yellow(`🔐 [${verificationId}] YouTube requires Google SSO, cancelling...`));
         const ssoResult = await cancelSso(verificationId);
         if (ssoResult.success) {
             currentStep = ssoResult.currentStep;
             await new Promise(r => setTimeout(r, 2000));
             const newStatus = await checkStatus(verificationId);
             if (newStatus.success) currentStep = newStatus.currentStep;
+        } else {
+            console.log(chalk.red(`❌ [${verificationId}] Failed to cancel SSO`));
         }
     }
     
     // STEP 4: Upload document
     if (currentStep === 'docUpload') {
-        console.log(chalk.yellow('📤 Uploading document...'));
+        console.log(chalk.yellow(`📤 [${verificationId}] Uploading document...`));
         
         for (const file of files) {
-            console.log(chalk.blue(`📄 File: ${path.basename(file)}`));
+            console.log(chalk.blue(`📄 [${verificationId}] File: ${path.basename(file)}`));
             
             const uploadResult = await uploadDocument(verificationId, file);
             if (uploadResult.success) {
-                console.log(chalk.yellow('⏳ Waiting for review (could take a few minutes)...'));
+                currentStep = uploadResult.currentStep || currentStep;
+                console.log(chalk.yellow(`⏳ [${verificationId}] Waiting for review (could take a few minutes)...`));
                 
                 // Check status multiple times with delays
                 for (let i = 0; i < 5; i++) {
@@ -410,36 +458,43 @@ async function processStudent(student, collegesMap, youtubeUrl) {
                     const status = await checkStatus(verificationId);
                     
                     if (status.currentStep === 'success') {
-                        console.log(chalk.green('✅ YouTube verification successful!'));
+                        console.log(chalk.green(`✅ [${verificationId}] YouTube verification successful!`));
                         
                         const youtubeResult = await getYoutubePremiumUrl(verificationId);
                         if (youtubeResult.success) {
-                            saveResult(youtubeResult.url);
+                            saveResult(youtubeResult.url, verificationId);
                             return youtubeResult.url;
                         }
                         break;
                     } else if (status.currentStep === 'pending') {
-                        console.log(chalk.yellow(`⏳ Still pending review... (check ${i + 1}/5)`));
-                    } else {
-                        console.log(chalk.yellow(`Current: ${status.currentStep}`));
+                        console.log(chalk.yellow(`⏳ [${verificationId}] Still pending review... (check ${i + 1}/5)`));
+                    } else if (status.currentStep === 'error') {
+                        console.log(chalk.red(`❌ [${verificationId}] Verification error occurred`));
                         break;
+                    } else {
+                        console.log(chalk.yellow(`📍 [${verificationId}] Current step: ${status.currentStep}`));
+                        if (status.currentStep !== 'docUpload') {
+                            break;
+                        }
                     }
                 }
                 
-                console.log(chalk.yellow('⚠️  Still pending after checks. Manual verification needed.'));
-                console.log(chalk.blue(`📋 Save this ID to check later: ${verificationId}`));
+                console.log(chalk.yellow(`⚠️ [${verificationId}] Still pending after checks. Manual verification needed.`));
+                console.log(chalk.blue(`📋 [${verificationId}] Save this ID to check later: ${verificationId}`));
                 break;
+            } else {
+                console.log(chalk.yellow(`⚠️ [${verificationId}] Upload failed, trying next file if available...`));
             }
         }
     } else if (currentStep === 'success') {
-        console.log(chalk.green('✅ Already verified!'));
+        console.log(chalk.green(`✅ [${verificationId}] Already verified!`));
         const youtubeResult = await getYoutubePremiumUrl(verificationId);
         if (youtubeResult.success) {
-            saveResult(youtubeResult.url);
+            saveResult(youtubeResult.url, verificationId);
             return youtubeResult.url;
         }
     } else {
-        console.log(chalk.red(`❌ Cannot proceed. Current step: ${currentStep}`));
+        console.log(chalk.red(`❌ [${verificationId}] Cannot proceed. Current step: ${currentStep}`));
     }
     
     return null;
