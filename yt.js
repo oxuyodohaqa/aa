@@ -13,6 +13,9 @@ const CONFIG = {
     outputFile: 'sukses.txt'
 };
 
+// Verification ID regex pattern (24-character hex string)
+const VERIFICATION_ID_PATTERN = '[a-f0-9]{24}';
+
 // Common headers for SheerID API requests
 const SHEERID_HEADERS = {
     'Accept': 'application/json',
@@ -92,10 +95,92 @@ function getCollegeIdFromFile(studentId, filename) {
     return match ? parseInt(match[1]) : null;
 }
 
-// CREATE VERIFICATION WITH CORRECT PROGRAM ID
-async function createYoutubeVerification(youtubeUrl) {
+// EXTRACT VERIFICATION ID FROM YOUTUBE SHEERID URL
+async function extractVerificationIdFromUrl(youtubeUrl) {
     try {
-        console.log(chalk.yellow('🚀 Creating YouTube Premium verification...'));
+        console.log(chalk.yellow('🔍 Extracting existing verification ID from URL...'));
+        
+        // Make a GET request to the SheerID page to extract the verificationId
+        const response = await axios.get(youtubeUrl, {
+            headers: {
+                ...SHEERID_HEADERS,
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Referer': 'https://www.youtube.com/'
+            },
+            timeout: 30000,
+            maxRedirects: 5
+        });
+        
+        const html = response.data;
+        
+        // Try multiple patterns to find verificationId in the page
+        // Pattern 1: verificationId in JSON data
+        let match = html.match(new RegExp(`"verificationId"\\s*:\\s*"(${VERIFICATION_ID_PATTERN})"`, 'i'));
+        if (match) {
+            console.log(chalk.green(`✅ Found verification ID in JSON: ${match[1]}`));
+            return match[1];
+        }
+        
+        // Pattern 2: verificationId in URL parameter
+        match = html.match(new RegExp(`verificationId[=:](${VERIFICATION_ID_PATTERN})`, 'i'));
+        if (match) {
+            console.log(chalk.green(`✅ Found verification ID in URL param: ${match[1]}`));
+            return match[1];
+        }
+        
+        // Pattern 3: Check for verification ID in window.__INITIAL_STATE__ or similar
+        match = html.match(new RegExp(`verificationId["']?\\s*[:=]\\s*["']?(${VERIFICATION_ID_PATTERN})["']?`, 'i'));
+        if (match) {
+            console.log(chalk.green(`✅ Found verification ID in state: ${match[1]}`));
+            return match[1];
+        }
+        
+        console.log(chalk.yellow('⚠️ Could not extract verification ID from page HTML'));
+        return null;
+        
+    } catch (error) {
+        console.log(chalk.yellow(`⚠️ Error extracting verification ID: ${error.message}`));
+        return null;
+    }
+}
+
+// GET OR CREATE VERIFICATION - Uses existing ID from URL or creates new one
+async function getOrCreateVerification(youtubeUrl) {
+    try {
+        // Step 1: Try to extract existing verification ID from the URL
+        const existingId = await extractVerificationIdFromUrl(youtubeUrl);
+        
+        if (existingId) {
+            console.log(chalk.green(`🔗 Using existing verification ID from URL: ${existingId}`));
+            
+            // Verify that the ID is valid by checking its status
+            try {
+                const statusResponse = await axios.get(
+                    `https://services.sheerid.com/rest/v2/verification/${existingId}`,
+                    {
+                        timeout: 10000,
+                        headers: SHEERID_HEADERS
+                    }
+                );
+                
+                console.log(chalk.green(`✅ Existing verification ID is valid!`));
+                console.log(chalk.blue(`📍 Current step: ${statusResponse.data.currentStep}`));
+                
+                return {
+                    success: true,
+                    verificationId: existingId,
+                    currentStep: statusResponse.data.currentStep,
+                    data: statusResponse.data,
+                    fromExistingUrl: true
+                };
+            } catch (statusError) {
+                console.log(chalk.yellow(`⚠️ Existing verification ID may be invalid: ${statusError.message}`));
+                // Fall through to create new verification
+            }
+        }
+        
+        // Step 2: If no existing ID found or invalid, create a new verification
+        console.log(chalk.yellow('🚀 Creating new YouTube Premium verification...'));
         console.log(chalk.blue(`📋 Using YouTube Program ID: 633f45d7295c0551ab43b87a`));
         
         const data = {
@@ -116,7 +201,7 @@ async function createYoutubeVerification(youtubeUrl) {
         );
         
         const verificationId = response.data.verificationId;
-        console.log(chalk.green(`✅ YouTube verification created!`));
+        console.log(chalk.green(`✅ New YouTube verification created!`));
         console.log(chalk.green(`📋 Verification ID: ${verificationId}`));
         console.log(chalk.blue(`📍 Current step: ${response.data.currentStep}`));
         
@@ -124,11 +209,12 @@ async function createYoutubeVerification(youtubeUrl) {
             success: true, 
             verificationId: verificationId,
             currentStep: response.data.currentStep,
-            data: response.data
+            data: response.data,
+            fromExistingUrl: false
         };
         
     } catch (error) {
-        console.log(chalk.red('❌ Failed to create YouTube verification'));
+        console.log(chalk.red('❌ Failed to get or create YouTube verification'));
         if (error.response) {
             console.log(chalk.red(`Status: ${error.response.status}`));
             console.log(chalk.red(`Error: ${JSON.stringify(error.response.data)}`));
@@ -368,17 +454,21 @@ function saveResult(url, verificationId) {
 async function processStudent(student, collegesMap, youtubeUrl) {
     console.log(chalk.cyan(`\n🎯 Processing for YouTube: ${student.firstName} ${student.lastName}`));
     
-    // STEP 1: Create YouTube verification
-    const verificationResult = await createYoutubeVerification(youtubeUrl);
+    // STEP 1: Get existing verification from URL or create new one
+    const verificationResult = await getOrCreateVerification(youtubeUrl);
     if (!verificationResult.success) {
-        console.log(chalk.red('❌ Failed to create verification'));
+        console.log(chalk.red('❌ Failed to get or create verification'));
         return null;
     }
     
     const verificationId = verificationResult.verificationId;
     let currentStep = verificationResult.currentStep;
     
-    console.log(chalk.green(`🔑 [${verificationId}] YouTube Verification ID obtained`));
+    if (verificationResult.fromExistingUrl) {
+        console.log(chalk.green(`🔗 [${verificationId}] Using existing verification from URL`));
+    } else {
+        console.log(chalk.green(`🔑 [${verificationId}] New YouTube Verification ID obtained`));
+    }
     
     // Get verification details
     await getVerificationDetails(verificationId);
