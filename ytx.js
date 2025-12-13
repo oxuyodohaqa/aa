@@ -38,6 +38,8 @@ const colors = {
     receipt: chalk.magenta
 };
 
+const stripAnsi = (text) => text.replace(/\x1B\[[0-?]*[ -\/]*[@-~]/g, '');
+
 // ==================== RECEIPT GENERATOR (REPLACES PYTHON) ====================
 class ReceiptGenerator {
     constructor() {
@@ -388,137 +390,140 @@ class ReceiptGenerator {
         const college = studentData.college;
         const studentId = studentData.student_id;
         const collegeId = college.id;
-        
+
         const filename = `SCHEDULE_${studentId}_${collegeId}.pdf`;
         const filepath = path.join(this.receiptsDir, filename);
-        
+
         try {
             const doc = new PDFDocument({ margin: 50 });
             const writeStream = fs.createWriteStream(filepath);
             doc.pipe(writeStream);
-            
+
             // Header
-            doc.fontSize(20)
-               .fillColor('#1e3a8a')
-               .text('OFFICIAL CLASS SCHEDULE', { align: 'center' })
-               .moveDown(0.5);
-            
-            doc.fontSize(16)
-               .fillColor('#2563eb')
-               .text(college.name, { align: 'center' })
+            doc.fontSize(18)
+               .fillColor('#0f172a')
+               .text(college.name.toUpperCase(), { align: 'center' })
+               .moveDown(0.2);
+
+            doc.fontSize(11)
+               .fillColor('#475569')
+               .text('Office of the University Registrar', { align: 'center' })
+               .text('Official Class Schedule & Enrollment Certification', { align: 'center' })
                .moveDown(1);
-            
+
             // Student Information
-            const studentInfo = [
-                `Student Name: ${studentData.full_name}`,
-                `Student ID: ${studentData.student_id}`,
-                `Program: ${studentData.program}`,
-                `Semester: ${studentData.academic_term}`,
-                `Status: Full-Time Active`
-            ];
-            
-            studentInfo.forEach(info => {
-                doc.fontSize(11)
-                   .fillColor('#1f2937')
-                   .text(info)
-                   .moveDown(0.3);
-            });
-            
-            doc.moveDown(1);
-            
+            const infoBoxY = doc.y;
+            doc.roundedRect(45, infoBoxY, 520, 90, 6)
+               .fillAndStroke('#f8fafc', '#e2e8f0');
+
+            doc.fillColor('#0f172a')
+               .fontSize(12)
+               .text(`Student Name: ${studentData.full_name}`, 60, infoBoxY + 12)
+               .text(`Student ID: ${studentData.student_id}`, 60, infoBoxY + 32)
+               .text(`Program: ${studentData.program}`, 60, infoBoxY + 52)
+               .text(`Academic Term: ${studentData.academic_term}`, 320, infoBoxY + 12)
+               .text(`Status: Enrolled (Full-Time)`, 320, infoBoxY + 32)
+               .text(`Date Issued: ${this.formatDate(studentData.date_issued)}`, 320, infoBoxY + 52);
+
+            doc.moveDown(5);
+
             // Class Schedule
-            doc.fontSize(14)
-               .fillColor('#1e3a8a')
+            doc.fontSize(13)
+               .fillColor('#0f172a')
                .text('Class Schedule', { underline: true })
                .moveDown(0.5);
-            
-            // Generate courses
+
             const courses = this.generateCourses(studentData.program);
-            
-            // Course table header
-            const headers = ['Course Code', 'Course Name', 'Days', 'Time', 'Room', 'Instructor'];
-            const colWidths = [80, 130, 50, 90, 70, 100];
-            
+            const headers = ['Course', 'Description', 'Days', 'Time', 'Room', 'Instructor', 'Units'];
+            const colWidths = [70, 140, 50, 90, 60, 90, 30];
+
             let y = doc.y;
-            
-            // Header row
-            doc.fillColor('#1e3a8a')
-               .rect(50, y, 500, 25)
+            doc.fillColor('#0f172a')
+               .rect(45, y, 520, 24)
                .fill();
-            
-            let x = 60;
+
+            let x = 50;
             headers.forEach((header, i) => {
                 doc.fillColor('white')
-                   .fontSize(10)
                    .font('Helvetica-Bold')
-                   .text(header, x, y + 8, { width: colWidths[i] });
+                   .fontSize(9)
+                   .text(header, x, y + 7, { width: colWidths[i] });
                 x += colWidths[i];
             });
-            
-            y += 25;
-            
-            // Course rows
+
+            y += 24;
+
+            let totalUnits = 0;
             courses.forEach((course, i) => {
-                doc.fillColor(i % 2 === 0 ? 'white' : '#f3f4f6')
-                   .rect(50, y, 500, 25)
+                const units = course.units || 3;
+                totalUnits += units;
+
+                doc.fillColor(i % 2 === 0 ? '#ffffff' : '#f8fafc')
+                   .rect(45, y, 520, 22)
                    .fill();
-                
-                x = 60;
+
+                x = 50;
                 const rowData = [
                     course.code,
                     course.name,
                     course.days,
                     course.time,
                     course.room,
-                    course.instructor
+                    course.instructor,
+                    units.toString()
                 ];
-                
+
                 rowData.forEach((text, j) => {
-                    doc.fillColor('#1f2937')
+                    doc.fillColor('#0f172a')
+                       .font('Helvetica')
                        .fontSize(9)
-                       .text(text, x, y + 8, { width: colWidths[j] });
+                       .text(text, x, y + 6, { width: colWidths[j] });
                     x += colWidths[j];
                 });
-                
-                y += 25;
+
+                y += 22;
             });
-            
-            doc.y = y + 20;
-            
-            // Important Dates
-            doc.fontSize(14)
-               .fillColor('#1e3a8a')
-               .text('Important Dates', { underline: true })
-               .moveDown(0.5);
-            
-            const datesInfo = [
-                `Semester Start: ${this.formatDate(studentData.first_day)}`,
-                `Semester End: ${this.formatDate(studentData.last_day)}`,
-                `Final Exams: ${this.formatDate(studentData.exam_week)}`
-            ];
-            
-            datesInfo.forEach(info => {
-                doc.fontSize(11)
-                   .fillColor('#1f2937')
-                   .text(info)
-                   .moveDown(0.3);
-            });
-            
-            doc.moveDown(2);
-            
+
+            doc.y = y + 15;
+
+            // Enrollment summary
+            doc.fontSize(11)
+               .fillColor('#0f172a')
+               .text(`Total Registered Units: ${totalUnits}`, { continued: true })
+               .text('   |   Academic Standing: Good', { align: 'left' })
+               .moveDown(0.5)
+               .text(`Class Period: ${this.formatDate(studentData.first_day)} to ${this.formatDate(studentData.last_day)}`)
+               .text(`Final Examination Week: ${this.formatDate(studentData.exam_week)}`)
+               .moveDown(1.5);
+
+            // Certification
+            doc.roundedRect(45, doc.y, 520, 60, 6)
+               .stroke('#94a3b8');
+
+            const certY = doc.y + 12;
+            doc.fillColor('#0f172a')
+               .fontSize(10)
+               .text('This is to certify that the student named above is officially enrolled in the courses listed and is in good standing for the stated academic term.', 60, certY, { width: 480 });
+
+            doc.fontSize(10)
+               .text('Registrar: Maria L. Santos', 60, certY + 28)
+               .text('Registrar Seal: ______________________', 330, certY + 28);
+
+            doc.moveDown(3);
+
             // Footer
             doc.fontSize(8)
-               .fillColor('#6b7280')
-               .text(`UNOFFICIAL STUDENT SCHEDULE • ${college.name} • Valid for verification purposes • Generated on: ${this.formatDate(studentData.date_issued)}`, { align: 'center' });
-            
+               .fillColor('#475569')
+               .text(`${college.name} • Registrar Office • Official Class Schedule for Verification Purposes`, { align: 'center' });
+
             doc.end();
-            
+
             writeStream.on('finish', () => {
                 console.log(colors.receipt(`📅 Created class schedule: ${filename}`));
             });
-            
+
             return filename;
-            
+
         } catch (e) {
             console.log(colors.error(`❌ Error creating schedule PDF: ${e.message}`));
             return null;
@@ -625,115 +630,45 @@ async function startTelegramBot(app) {
     console.log(colors.info(`👑 Admin ID: ${CONFIG.adminId}`));
     console.log(colors.info(`📄 Auto receipt quantity: ${CONFIG.autoReceiptQuantity}`));
 
-    bot.start((ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
+    const captureLogs = async (fn) => {
+        const buffer = [];
+        const originalLog = console.log;
+        let capturedError = null;
 
-        ctx.reply('Send a YouTube verification link to start automation.');
-    });
-
-    bot.hears(/https?:\/\/\S+/i, async (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
-
-        const link = ctx.message.text.trim();
-        await ctx.reply('🚀 Verification started for your link.');
-        await ctx.reply('⏳ Please wait 10 seconds while we verify...');
+        console.log = (...args) => {
+            const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+            buffer.push(stripAnsi(message));
+            originalLog(...args);
+        };
 
         try {
-            const qty = 1; // enforce 1 link = 1 student
-            await app.receiptGenerator.generateReceipts(qty);
-            await app.sheerIDSubmitter.submitAll(link, { maxStudents: 1 });
-
-            // Pause before sending the success update to match the requested flow
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            await ctx.reply('✅ Success! Verification completed. Data cleared for the next link.');
+            await fn();
         } catch (error) {
-            console.log(colors.error(`💥 Bot error: ${error.message}`));
-            await ctx.reply('❌ Automation failed. Check server logs.');
+            capturedError = error;
+            buffer.push(`Error: ${error.message}`);
         } finally {
-            app.receiptGenerator.clearAllData();
-        }
-    });
-
-    bot.on('text', (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
+            console.log = originalLog;
         }
 
-        ctx.reply('Send a valid link to start automation.');
-    });
+        return { logText: buffer.join('\n') || 'No logs generated.', error: capturedError };
+    };
 
-    await bot.launch();
-
-    process.once('SIGINT', () => bot.stop('SIGINT'));
-    process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-    console.log(colors.success('✅ Bot is running. Send a link to trigger automation.'));
-}
-
-// ==================== TELEGRAM BOT MODE ====================
-async function startTelegramBot(app) {
-    const bot = new Telegraf(CONFIG.botToken);
-
-    console.log(colors.info('\n🤖 Starting Telegram bot mode'));
-    console.log(colors.info(`👑 Admin ID: ${CONFIG.adminId}`));
-    console.log(colors.info(`📄 Auto receipt quantity: ${CONFIG.autoReceiptQuantity}`));
-
-    bot.start((ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
+    const sendLogMessages = async (ctx, logText) => {
+        if (!logText.trim()) {
+            return;
         }
 
-        ctx.reply('Send a YouTube verification link to start automation.');
-    });
-
-    bot.hears(/https?:\/\/\S+/i, async (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
+        const maxLength = 3500; // keep under Telegram 4096 limit with formatting
+        const chunks = [];
+        for (let i = 0; i < logText.length; i += maxLength) {
+            chunks.push(logText.slice(i, i + maxLength));
         }
 
-        const link = ctx.message.text.trim();
-        await ctx.reply('🚀 Starting automation...');
-
-        try {
-            const qty = 1; // enforce 1 link = 1 student
-            await app.receiptGenerator.generateReceipts(qty);
-            await app.sheerIDSubmitter.submitAll(link, { maxStudents: 1 });
-            await ctx.reply('✅ Automation finished. Data cleared for next link.');
-        } catch (error) {
-            console.log(colors.error(`💥 Bot error: ${error.message}`));
-            await ctx.reply('❌ Automation failed. Check server logs.');
-        } finally {
-            app.receiptGenerator.clearAllData();
+        for (let i = 0; i < chunks.length; i++) {
+            const header = chunks.length > 1 ? `🧾 Automation log (${i + 1}/${chunks.length})` : '🧾 Automation log';
+            await ctx.reply(`${header}\n\n\`\`\`${chunks[i]}\`\`\``);
         }
-    });
-
-    bot.on('text', (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
-
-        ctx.reply('Send a valid link to start automation.');
-    });
-
-    await bot.launch();
-
-    process.once('SIGINT', () => bot.stop('SIGINT'));
-    process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-    console.log(colors.success('✅ Bot is running. Send a link to trigger automation.'));
-}
-
-// ==================== TELEGRAM BOT MODE ====================
-async function startTelegramBot(app) {
-    const bot = new Telegraf(CONFIG.botToken);
-
-    console.log(colors.info('\n🤖 Starting Telegram bot mode'));
-    console.log(colors.info(`👑 Admin ID: ${CONFIG.adminId}`));
-    console.log(colors.info(`📄 Auto receipt quantity: ${CONFIG.autoReceiptQuantity}`));
+    };
 
     bot.start((ctx) => {
         if (ctx.from.id !== CONFIG.adminId) {
@@ -755,17 +690,24 @@ async function startTelegramBot(app) {
 
         await ctx.reply('🚀 Starting automation...');
 
-        try {
+        let logText = '';
+        const { logText: collectedLogs, error } = await captureLogs(async () => {
             const qty = 1; // enforce 1 link = 1 student
             await app.receiptGenerator.generateReceipts(qty);
             await app.sheerIDSubmitter.submitAll(link, { maxStudents: 1 });
-            await ctx.reply('✅ Automation finished. Data cleared for next link.');
-        } catch (error) {
+        });
+
+        logText = collectedLogs;
+
+        if (error) {
             console.log(colors.error(`💥 Bot error: ${error.message}`));
             await ctx.reply('❌ Automation failed. Check server logs.');
-        } finally {
-            app.receiptGenerator.clearAllData();
+        } else {
+            await ctx.reply('✅ Automation finished. Data cleared for next link.');
         }
+
+        app.receiptGenerator.clearAllData();
+        await sendLogMessages(ctx, logText || 'No logs generated.');
     });
 
     await bot.launch();
@@ -838,11 +780,23 @@ class SheerIDSubmitter {
         }
     }
     
+    getFilePriority(filePath) {
+        const basename = path.basename(filePath).toLowerCase();
+
+        if (basename.includes('tuition')) return 0;
+        if (basename.includes('schedule')) return 1;
+        return 2;
+    }
+
+    prioritizeDocuments(files) {
+        return files.sort((a, b) => this.getFilePriority(a) - this.getFilePriority(b));
+    }
+
     findStudentFiles(studentId) {
         if (!fs.existsSync(CONFIG.receiptsDir)) {
             return [];
         }
-        
+
         const files = fs.readdirSync(CONFIG.receiptsDir);
         return files.filter(file => {
             return file.includes(`_${studentId}_`) || file.includes(`${studentId}_`);
@@ -1149,12 +1103,12 @@ class SheerIDSubmitter {
         if (!verificationData) return null;
         
         // Step 2: Find files and get college
-        const files = this.findStudentFiles(student.studentId);
+        const files = this.prioritizeDocuments(this.findStudentFiles(student.studentId));
         if (files.length === 0) {
             console.log(colors.error('❌ No files found'));
             return null;
         }
-        
+
         const firstFile = files[0];
         const collegeId = this.getCollegeIdFromFile(student.studentId, path.basename(firstFile));
         if (!collegeId) {
@@ -1184,29 +1138,45 @@ class SheerIDSubmitter {
         
         // Step 5: Upload document if needed
         if (status.currentStep === 'docUpload') {
+            let uploadedCount = 0;
+
             for (const file of files) {
+                const uploadStatus = await this.checkStatus(verificationData.verificationId);
+                if (uploadStatus.success && uploadStatus.currentStep !== 'docUpload') {
+                    console.log(colors.info('ℹ️  Verification moved past document upload; skipping remaining files'));
+                    break;
+                }
+
                 const uploadResult = await this.uploadDocument(verificationData.verificationId, file);
                 if (uploadResult.success) {
-                    await this.sleep(5000);
-                    
-                    // Step 6: Wait for verification
-                    const verifyResult = await this.waitForVerification(verificationData.verificationId);
-                    if (verifyResult.success) {
-                        // Step 7: Get YouTube URL
-                        const youtubeResult = await this.getYoutubeRedirectUrl(verificationData.verificationId);
-                        
-                        // Save results
-                        this.saveSuccess(verificationData.verificationId, youtubeResult.url, student);
-                        
-                        if (youtubeResult.url) {
-                            console.log(colors.success(`🎉 SUCCESS! YouTube URL: ${youtubeResult.url}`));
-                            return youtubeResult.url;
-                        } else {
-                            console.log(colors.success('✅ Verification successful!'));
-                            return verificationData.verificationId;
-                        }
-                    }
+                    uploadedCount++;
+                    await this.sleep(2000);
+                } else {
+                    console.log(colors.error('❌ Stopping uploads due to failure'));
                     break;
+                }
+            }
+
+            if (uploadedCount === 0) {
+                console.log(colors.error('❌ No documents were uploaded successfully'));
+                return null;
+            }
+
+            // Step 6: Wait for verification after uploading all files
+            const verifyResult = await this.waitForVerification(verificationData.verificationId);
+            if (verifyResult.success) {
+                // Step 7: Get YouTube URL
+                const youtubeResult = await this.getYoutubeRedirectUrl(verificationData.verificationId);
+
+                // Save results
+                this.saveSuccess(verificationData.verificationId, youtubeResult.url, student);
+
+                if (youtubeResult.url) {
+                    console.log(colors.success(`🎉 SUCCESS! YouTube URL: ${youtubeResult.url}`));
+                    return youtubeResult.url;
+                } else {
+                    console.log(colors.success('✅ Verification successful!'));
+                    return verificationData.verificationId;
                 }
             }
         }
