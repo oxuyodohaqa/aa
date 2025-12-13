@@ -40,6 +40,8 @@ const colors = {
 
 const stripAnsi = (text) => text.replace(/\x1B\[[0-?]*[ -\/]*[@-~]/g, '');
 
+const stripAnsi = (text) => text.replace(/\x1B\[[0-?]*[ -\/]*[@-~]/g, '');
+
 // ==================== RECEIPT GENERATOR (REPLACES PYTHON) ====================
 class ReceiptGenerator {
     constructor() {
