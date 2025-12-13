@@ -38,6 +38,8 @@ const colors = {
     receipt: chalk.magenta
 };
 
+const stripAnsi = (text) => text.replace(/\x1B\[[0-?]*[ -\/]*[@-~]/g, '');
+
 // ==================== RECEIPT GENERATOR (REPLACES PYTHON) ====================
 class ReceiptGenerator {
     constructor() {
@@ -625,115 +627,33 @@ async function startTelegramBot(app) {
     console.log(colors.info(`👑 Admin ID: ${CONFIG.adminId}`));
     console.log(colors.info(`📄 Auto receipt quantity: ${CONFIG.autoReceiptQuantity}`));
 
-    bot.start((ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
+    const captureLogs = async (fn) => {
+        const buffer = [];
+        const originalLog = console.log;
+        let capturedError = null;
 
-        ctx.reply('Send a YouTube verification link to start automation.');
-    });
-
-    bot.hears(/https?:\/\/\S+/i, async (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
-
-        const link = ctx.message.text.trim();
-        await ctx.reply('🚀 Verification started for your link.');
-        await ctx.reply('⏳ Please wait 10 seconds while we verify...');
+        console.log = (...args) => {
+            const message = args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg)).join(' ');
+            buffer.push(stripAnsi(message));
+            originalLog(...args);
+        };
 
         try {
-            const qty = 1; // enforce 1 link = 1 student
-            await app.receiptGenerator.generateReceipts(qty);
-            await app.sheerIDSubmitter.submitAll(link, { maxStudents: 1 });
-
-            // Pause before sending the success update to match the requested flow
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            await ctx.reply('✅ Success! Verification completed. Data cleared for the next link.');
+            await fn();
         } catch (error) {
-            console.log(colors.error(`💥 Bot error: ${error.message}`));
-            await ctx.reply('❌ Automation failed. Check server logs.');
+            capturedError = error;
+            buffer.push(`Error: ${error.message}`);
         } finally {
-            app.receiptGenerator.clearAllData();
-        }
-    });
-
-    bot.on('text', (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
+            console.log = originalLog;
         }
 
-        ctx.reply('Send a valid link to start automation.');
-    });
+        return { logText: buffer.join('\n') || 'No logs generated.', error: capturedError };
+    };
 
-    await bot.launch();
-
-    process.once('SIGINT', () => bot.stop('SIGINT'));
-    process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-    console.log(colors.success('✅ Bot is running. Send a link to trigger automation.'));
-}
-
-// ==================== TELEGRAM BOT MODE ====================
-async function startTelegramBot(app) {
-    const bot = new Telegraf(CONFIG.botToken);
-
-    console.log(colors.info('\n🤖 Starting Telegram bot mode'));
-    console.log(colors.info(`👑 Admin ID: ${CONFIG.adminId}`));
-    console.log(colors.info(`📄 Auto receipt quantity: ${CONFIG.autoReceiptQuantity}`));
-
-    bot.start((ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
-
-        ctx.reply('Send a YouTube verification link to start automation.');
-    });
-
-    bot.hears(/https?:\/\/\S+/i, async (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
-
-        const link = ctx.message.text.trim();
-        await ctx.reply('🚀 Starting automation...');
-
-        try {
-            const qty = 1; // enforce 1 link = 1 student
-            await app.receiptGenerator.generateReceipts(qty);
-            await app.sheerIDSubmitter.submitAll(link, { maxStudents: 1 });
-            await ctx.reply('✅ Automation finished. Data cleared for next link.');
-        } catch (error) {
-            console.log(colors.error(`💥 Bot error: ${error.message}`));
-            await ctx.reply('❌ Automation failed. Check server logs.');
-        } finally {
-            app.receiptGenerator.clearAllData();
-        }
-    });
-
-    bot.on('text', (ctx) => {
-        if (ctx.from.id !== CONFIG.adminId) {
-            return ctx.reply('❌ Unauthorized');
-        }
-
-        ctx.reply('Send a valid link to start automation.');
-    });
-
-    await bot.launch();
-
-    process.once('SIGINT', () => bot.stop('SIGINT'));
-    process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-    console.log(colors.success('✅ Bot is running. Send a link to trigger automation.'));
-}
-
-// ==================== TELEGRAM BOT MODE ====================
-async function startTelegramBot(app) {
-    const bot = new Telegraf(CONFIG.botToken);
-
-    console.log(colors.info('\n🤖 Starting Telegram bot mode'));
-    console.log(colors.info(`👑 Admin ID: ${CONFIG.adminId}`));
-    console.log(colors.info(`📄 Auto receipt quantity: ${CONFIG.autoReceiptQuantity}`));
+    const sendLogFile = async (ctx, logText) => {
+        const logBuffer = Buffer.from(logText, 'utf-8');
+        await ctx.replyWithDocument({ source: logBuffer, filename: 'process.log.txt' });
+    };
 
     bot.start((ctx) => {
         if (ctx.from.id !== CONFIG.adminId) {
@@ -755,16 +675,25 @@ async function startTelegramBot(app) {
 
         await ctx.reply('🚀 Starting automation...');
 
-        try {
+        let logText = '';
+        const { logText: collectedLogs, error } = await captureLogs(async () => {
             const qty = 1; // enforce 1 link = 1 student
             await app.receiptGenerator.generateReceipts(qty);
             await app.sheerIDSubmitter.submitAll(link, { maxStudents: 1 });
-            await ctx.reply('✅ Automation finished. Data cleared for next link.');
-        } catch (error) {
+        });
+
+        logText = collectedLogs;
+
+        if (error) {
             console.log(colors.error(`💥 Bot error: ${error.message}`));
             await ctx.reply('❌ Automation failed. Check server logs.');
-        } finally {
-            app.receiptGenerator.clearAllData();
+        } else {
+            await ctx.reply('✅ Automation finished. Data cleared for next link.');
+        }
+
+        app.receiptGenerator.clearAllData();
+        if (logText) {
+            await sendLogFile(ctx, logText);
         }
     });
 
@@ -838,11 +767,23 @@ class SheerIDSubmitter {
         }
     }
     
+    getFilePriority(filePath) {
+        const basename = path.basename(filePath).toLowerCase();
+
+        if (basename.includes('tuition')) return 0;
+        if (basename.includes('schedule')) return 1;
+        return 2;
+    }
+
+    prioritizeDocuments(files) {
+        return files.sort((a, b) => this.getFilePriority(a) - this.getFilePriority(b));
+    }
+
     findStudentFiles(studentId) {
         if (!fs.existsSync(CONFIG.receiptsDir)) {
             return [];
         }
-        
+
         const files = fs.readdirSync(CONFIG.receiptsDir);
         return files.filter(file => {
             return file.includes(`_${studentId}_`) || file.includes(`${studentId}_`);
@@ -1149,12 +1090,12 @@ class SheerIDSubmitter {
         if (!verificationData) return null;
         
         // Step 2: Find files and get college
-        const files = this.findStudentFiles(student.studentId);
+        const files = this.prioritizeDocuments(this.findStudentFiles(student.studentId));
         if (files.length === 0) {
             console.log(colors.error('❌ No files found'));
             return null;
         }
-        
+
         const firstFile = files[0];
         const collegeId = this.getCollegeIdFromFile(student.studentId, path.basename(firstFile));
         if (!collegeId) {
@@ -1184,29 +1125,45 @@ class SheerIDSubmitter {
         
         // Step 5: Upload document if needed
         if (status.currentStep === 'docUpload') {
+            let uploadedCount = 0;
+
             for (const file of files) {
+                const uploadStatus = await this.checkStatus(verificationData.verificationId);
+                if (uploadStatus.success && uploadStatus.currentStep !== 'docUpload') {
+                    console.log(colors.info('ℹ️  Verification moved past document upload; skipping remaining files'));
+                    break;
+                }
+
                 const uploadResult = await this.uploadDocument(verificationData.verificationId, file);
                 if (uploadResult.success) {
-                    await this.sleep(5000);
-                    
-                    // Step 6: Wait for verification
-                    const verifyResult = await this.waitForVerification(verificationData.verificationId);
-                    if (verifyResult.success) {
-                        // Step 7: Get YouTube URL
-                        const youtubeResult = await this.getYoutubeRedirectUrl(verificationData.verificationId);
-                        
-                        // Save results
-                        this.saveSuccess(verificationData.verificationId, youtubeResult.url, student);
-                        
-                        if (youtubeResult.url) {
-                            console.log(colors.success(`🎉 SUCCESS! YouTube URL: ${youtubeResult.url}`));
-                            return youtubeResult.url;
-                        } else {
-                            console.log(colors.success('✅ Verification successful!'));
-                            return verificationData.verificationId;
-                        }
-                    }
+                    uploadedCount++;
+                    await this.sleep(2000);
+                } else {
+                    console.log(colors.error('❌ Stopping uploads due to failure'));
                     break;
+                }
+            }
+
+            if (uploadedCount === 0) {
+                console.log(colors.error('❌ No documents were uploaded successfully'));
+                return null;
+            }
+
+            // Step 6: Wait for verification after uploading all files
+            const verifyResult = await this.waitForVerification(verificationData.verificationId);
+            if (verifyResult.success) {
+                // Step 7: Get YouTube URL
+                const youtubeResult = await this.getYoutubeRedirectUrl(verificationData.verificationId);
+
+                // Save results
+                this.saveSuccess(verificationData.verificationId, youtubeResult.url, student);
+
+                if (youtubeResult.url) {
+                    console.log(colors.success(`🎉 SUCCESS! YouTube URL: ${youtubeResult.url}`));
+                    return youtubeResult.url;
+                } else {
+                    console.log(colors.success('✅ Verification successful!'));
+                    return verificationData.verificationId;
                 }
             }
         }
