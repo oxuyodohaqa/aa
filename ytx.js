@@ -767,11 +767,23 @@ class SheerIDSubmitter {
         }
     }
     
+    getFilePriority(filePath) {
+        const basename = path.basename(filePath).toLowerCase();
+
+        if (basename.includes('tuition')) return 0;
+        if (basename.includes('schedule')) return 1;
+        return 2;
+    }
+
+    prioritizeDocuments(files) {
+        return files.sort((a, b) => this.getFilePriority(a) - this.getFilePriority(b));
+    }
+
     findStudentFiles(studentId) {
         if (!fs.existsSync(CONFIG.receiptsDir)) {
             return [];
         }
-        
+
         const files = fs.readdirSync(CONFIG.receiptsDir);
         return files.filter(file => {
             return file.includes(`_${studentId}_`) || file.includes(`${studentId}_`);
@@ -1078,12 +1090,12 @@ class SheerIDSubmitter {
         if (!verificationData) return null;
         
         // Step 2: Find files and get college
-        const files = this.findStudentFiles(student.studentId);
+        const files = this.prioritizeDocuments(this.findStudentFiles(student.studentId));
         if (files.length === 0) {
             console.log(colors.error('❌ No files found'));
             return null;
         }
-        
+
         const firstFile = files[0];
         const collegeId = this.getCollegeIdFromFile(student.studentId, path.basename(firstFile));
         if (!collegeId) {
@@ -1116,10 +1128,19 @@ class SheerIDSubmitter {
             let uploadedCount = 0;
 
             for (const file of files) {
+                const uploadStatus = await this.checkStatus(verificationData.verificationId);
+                if (uploadStatus.success && uploadStatus.currentStep !== 'docUpload') {
+                    console.log(colors.info('ℹ️  Verification moved past document upload; skipping remaining files'));
+                    break;
+                }
+
                 const uploadResult = await this.uploadDocument(verificationData.verificationId, file);
                 if (uploadResult.success) {
                     uploadedCount++;
                     await this.sleep(2000);
+                } else {
+                    console.log(colors.error('❌ Stopping uploads due to failure'));
+                    break;
                 }
             }
 
