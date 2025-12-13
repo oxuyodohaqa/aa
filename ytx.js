@@ -40,6 +40,8 @@ const colors = {
 
 const stripAnsi = (text) => text.replace(/\x1B\[[0-?]*[ -\/]*[@-~]/g, '');
 
+const stripAnsi = (text) => text.replace(/\x1B\[[0-?]*[ -\/]*[@-~]/g, '');
+
 // ==================== RECEIPT GENERATOR (REPLACES PYTHON) ====================
 class ReceiptGenerator {
     constructor() {
@@ -390,137 +392,140 @@ class ReceiptGenerator {
         const college = studentData.college;
         const studentId = studentData.student_id;
         const collegeId = college.id;
-        
+
         const filename = `SCHEDULE_${studentId}_${collegeId}.pdf`;
         const filepath = path.join(this.receiptsDir, filename);
-        
+
         try {
             const doc = new PDFDocument({ margin: 50 });
             const writeStream = fs.createWriteStream(filepath);
             doc.pipe(writeStream);
-            
+
             // Header
-            doc.fontSize(20)
-               .fillColor('#1e3a8a')
-               .text('OFFICIAL CLASS SCHEDULE', { align: 'center' })
-               .moveDown(0.5);
-            
-            doc.fontSize(16)
-               .fillColor('#2563eb')
-               .text(college.name, { align: 'center' })
+            doc.fontSize(18)
+               .fillColor('#0f172a')
+               .text(college.name.toUpperCase(), { align: 'center' })
+               .moveDown(0.2);
+
+            doc.fontSize(11)
+               .fillColor('#475569')
+               .text('Office of the University Registrar', { align: 'center' })
+               .text('Official Class Schedule & Enrollment Certification', { align: 'center' })
                .moveDown(1);
-            
+
             // Student Information
-            const studentInfo = [
-                `Student Name: ${studentData.full_name}`,
-                `Student ID: ${studentData.student_id}`,
-                `Program: ${studentData.program}`,
-                `Semester: ${studentData.academic_term}`,
-                `Status: Full-Time Active`
-            ];
-            
-            studentInfo.forEach(info => {
-                doc.fontSize(11)
-                   .fillColor('#1f2937')
-                   .text(info)
-                   .moveDown(0.3);
-            });
-            
-            doc.moveDown(1);
-            
+            const infoBoxY = doc.y;
+            doc.roundedRect(45, infoBoxY, 520, 90, 6)
+               .fillAndStroke('#f8fafc', '#e2e8f0');
+
+            doc.fillColor('#0f172a')
+               .fontSize(12)
+               .text(`Student Name: ${studentData.full_name}`, 60, infoBoxY + 12)
+               .text(`Student ID: ${studentData.student_id}`, 60, infoBoxY + 32)
+               .text(`Program: ${studentData.program}`, 60, infoBoxY + 52)
+               .text(`Academic Term: ${studentData.academic_term}`, 320, infoBoxY + 12)
+               .text(`Status: Enrolled (Full-Time)`, 320, infoBoxY + 32)
+               .text(`Date Issued: ${this.formatDate(studentData.date_issued)}`, 320, infoBoxY + 52);
+
+            doc.moveDown(5);
+
             // Class Schedule
-            doc.fontSize(14)
-               .fillColor('#1e3a8a')
+            doc.fontSize(13)
+               .fillColor('#0f172a')
                .text('Class Schedule', { underline: true })
                .moveDown(0.5);
-            
-            // Generate courses
+
             const courses = this.generateCourses(studentData.program);
-            
-            // Course table header
-            const headers = ['Course Code', 'Course Name', 'Days', 'Time', 'Room', 'Instructor'];
-            const colWidths = [80, 130, 50, 90, 70, 100];
-            
+            const headers = ['Course', 'Description', 'Days', 'Time', 'Room', 'Instructor', 'Units'];
+            const colWidths = [70, 140, 50, 90, 60, 90, 30];
+
             let y = doc.y;
-            
-            // Header row
-            doc.fillColor('#1e3a8a')
-               .rect(50, y, 500, 25)
+            doc.fillColor('#0f172a')
+               .rect(45, y, 520, 24)
                .fill();
-            
-            let x = 60;
+
+            let x = 50;
             headers.forEach((header, i) => {
                 doc.fillColor('white')
-                   .fontSize(10)
                    .font('Helvetica-Bold')
-                   .text(header, x, y + 8, { width: colWidths[i] });
+                   .fontSize(9)
+                   .text(header, x, y + 7, { width: colWidths[i] });
                 x += colWidths[i];
             });
-            
-            y += 25;
-            
-            // Course rows
+
+            y += 24;
+
+            let totalUnits = 0;
             courses.forEach((course, i) => {
-                doc.fillColor(i % 2 === 0 ? 'white' : '#f3f4f6')
-                   .rect(50, y, 500, 25)
+                const units = course.units || 3;
+                totalUnits += units;
+
+                doc.fillColor(i % 2 === 0 ? '#ffffff' : '#f8fafc')
+                   .rect(45, y, 520, 22)
                    .fill();
-                
-                x = 60;
+
+                x = 50;
                 const rowData = [
                     course.code,
                     course.name,
                     course.days,
                     course.time,
                     course.room,
-                    course.instructor
+                    course.instructor,
+                    units.toString()
                 ];
-                
+
                 rowData.forEach((text, j) => {
-                    doc.fillColor('#1f2937')
+                    doc.fillColor('#0f172a')
+                       .font('Helvetica')
                        .fontSize(9)
-                       .text(text, x, y + 8, { width: colWidths[j] });
+                       .text(text, x, y + 6, { width: colWidths[j] });
                     x += colWidths[j];
                 });
-                
-                y += 25;
+
+                y += 22;
             });
-            
-            doc.y = y + 20;
-            
-            // Important Dates
-            doc.fontSize(14)
-               .fillColor('#1e3a8a')
-               .text('Important Dates', { underline: true })
-               .moveDown(0.5);
-            
-            const datesInfo = [
-                `Semester Start: ${this.formatDate(studentData.first_day)}`,
-                `Semester End: ${this.formatDate(studentData.last_day)}`,
-                `Final Exams: ${this.formatDate(studentData.exam_week)}`
-            ];
-            
-            datesInfo.forEach(info => {
-                doc.fontSize(11)
-                   .fillColor('#1f2937')
-                   .text(info)
-                   .moveDown(0.3);
-            });
-            
-            doc.moveDown(2);
-            
+
+            doc.y = y + 15;
+
+            // Enrollment summary
+            doc.fontSize(11)
+               .fillColor('#0f172a')
+               .text(`Total Registered Units: ${totalUnits}`, { continued: true })
+               .text('   |   Academic Standing: Good', { align: 'left' })
+               .moveDown(0.5)
+               .text(`Class Period: ${this.formatDate(studentData.first_day)} to ${this.formatDate(studentData.last_day)}`)
+               .text(`Final Examination Week: ${this.formatDate(studentData.exam_week)}`)
+               .moveDown(1.5);
+
+            // Certification
+            doc.roundedRect(45, doc.y, 520, 60, 6)
+               .stroke('#94a3b8');
+
+            const certY = doc.y + 12;
+            doc.fillColor('#0f172a')
+               .fontSize(10)
+               .text('This is to certify that the student named above is officially enrolled in the courses listed and is in good standing for the stated academic term.', 60, certY, { width: 480 });
+
+            doc.fontSize(10)
+               .text('Registrar: Maria L. Santos', 60, certY + 28)
+               .text('Registrar Seal: ______________________', 330, certY + 28);
+
+            doc.moveDown(3);
+
             // Footer
             doc.fontSize(8)
-               .fillColor('#6b7280')
-               .text(`UNOFFICIAL STUDENT SCHEDULE • ${college.name} • Valid for verification purposes • Generated on: ${this.formatDate(studentData.date_issued)}`, { align: 'center' });
-            
+               .fillColor('#475569')
+               .text(`${college.name} • Registrar Office • Official Class Schedule for Verification Purposes`, { align: 'center' });
+
             doc.end();
-            
+
             writeStream.on('finish', () => {
                 console.log(colors.receipt(`📅 Created class schedule: ${filename}`));
             });
-            
+
             return filename;
-            
+
         } catch (e) {
             console.log(colors.error(`❌ Error creating schedule PDF: ${e.message}`));
             return null;
@@ -650,9 +655,21 @@ async function startTelegramBot(app) {
         return { logText: buffer.join('\n') || 'No logs generated.', error: capturedError };
     };
 
-    const sendLogFile = async (ctx, logText) => {
-        const logBuffer = Buffer.from(logText, 'utf-8');
-        await ctx.replyWithDocument({ source: logBuffer, filename: 'process.log.txt' });
+    const sendLogMessages = async (ctx, logText) => {
+        if (!logText.trim()) {
+            return;
+        }
+
+        const maxLength = 3500; // keep under Telegram 4096 limit with formatting
+        const chunks = [];
+        for (let i = 0; i < logText.length; i += maxLength) {
+            chunks.push(logText.slice(i, i + maxLength));
+        }
+
+        for (let i = 0; i < chunks.length; i++) {
+            const header = chunks.length > 1 ? `🧾 Automation log (${i + 1}/${chunks.length})` : '🧾 Automation log';
+            await ctx.reply(`${header}\n\n\`\`\`${chunks[i]}\`\`\``);
+        }
     };
 
     bot.start((ctx) => {
@@ -692,9 +709,7 @@ async function startTelegramBot(app) {
         }
 
         app.receiptGenerator.clearAllData();
-        if (logText) {
-            await sendLogFile(ctx, logText);
-        }
+        await sendLogMessages(ctx, logText || 'No logs generated.');
     });
 
     await bot.launch();
